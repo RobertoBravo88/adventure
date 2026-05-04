@@ -287,19 +287,39 @@ function renderItinerary() {
   container.innerHTML = '';
 
   const sections = [
-    { label: 'The Wedding', emoji: '💍', dayIds: [1, 2, 3, 4, 5] },
-    { label: 'Rome',        emoji: '🏛', dayIds: [6, 7, 8, 9] },
-    { label: 'Florence',    emoji: '⛪', dayIds: [10, 11, 12, 13] },
+    {
+      label: 'The Wedding', sublabel: 'Poland · May 13–17', dayIds: [1, 2, 3, 4, 5],
+      photo: 'https://images.unsplash.com/photo-1502635385003-ee1e6a1a742d?q=80&w=1587&auto=format&fit=crop'
+    },
+    {
+      label: 'Rome', sublabel: 'Italy · May 18–21', dayIds: [6, 7, 8, 9],
+      photo: 'https://plus.unsplash.com/premium_photo-1675975706513-9daba0ec12a8?q=80&w=1740&auto=format&fit=crop'
+    },
+    {
+      label: 'Florence', sublabel: 'Italy · May 22–25', dayIds: [10, 11, 12, 13],
+      photo: 'https://plus.unsplash.com/premium_photo-1676288635850-cd91d5b2a3af?q=80&w=1587&auto=format&fit=crop'
+    },
   ];
 
+  let currentGroup = null;
+
   TRIP.days.forEach(day => {
-    // Insert section header before first day of each section
     const section = sections.find(s => s.dayIds[0] === day.id);
     if (section) {
       const header = document.createElement('div');
       header.className = 'itinerary-section-header';
-      header.innerHTML = `<span class="section-emoji">${section.emoji}</span><span class="section-title">${section.label}</span>`;
+      header.innerHTML = `
+        <div class="section-hero-photo" style="background-image:url('${section.photo}')"></div>
+        <div class="section-hero-content">
+          <div class="section-hero-label">Chapter</div>
+          <div class="section-hero-title">${section.label}</div>
+          <div class="section-hero-days">${section.sublabel}</div>
+        </div>
+      `;
       container.appendChild(header);
+      currentGroup = document.createElement('div');
+      currentGroup.className = 'day-cards-group';
+      container.appendChild(currentGroup);
     }
 
     const likedCount = day.activities.filter(a => a.liked).length;
@@ -320,7 +340,7 @@ function renderItinerary() {
         <span class="activity-count">${day.activities.length} items${likedCount ? ` · ${likedCount} ♡` : ''}${hasRecs ? ' · ✨' : ''}</span>
       </div>
     `;
-    container.appendChild(card);
+    (currentGroup || container).appendChild(card);
   });
 }
 
