@@ -88,7 +88,7 @@ html, body {
 .welcome-content {
   position: relative;
   z-index: 1;
-  padding: 0 28px 60px;
+  padding: 0 clamp(20px, 6vw, 32px) clamp(48px, 10vw, 72px);
   width: 100%;
 }
 
@@ -115,12 +115,12 @@ html, body {
 
 .welcome-title {
   font-family: var(--font);
-  font-size: 80px;
+  font-size: clamp(52px, 17vw, 80px);
   font-weight: 700;
   color: #FFFFFF;
   line-height: 0.9;
   margin-bottom: 20px;
-  letter-spacing: -3px;
+  letter-spacing: clamp(-1px, -0.4vw, -3px);
 }
 
 .welcome-subtitle {
@@ -279,7 +279,7 @@ html, body {
 /* ===== SECTION HERO (chapter header) ===== */
 .itinerary-section-header {
   position: relative;
-  height: 160px;
+  height: clamp(120px, 28vw, 160px);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -333,7 +333,7 @@ html, body {
 
 .section-hero-title {
   font-family: var(--font);
-  font-size: 36px;
+  font-size: clamp(26px, 7.5vw, 36px);
   font-weight: 700;
   color: #FFFFFF;
   line-height: 1;
@@ -479,7 +479,7 @@ html, body {
 
 .day-hero-title {
   font-family: var(--font);
-  font-size: 28px;
+  font-size: clamp(22px, 6vw, 28px);
   font-weight: 700;
   color: var(--ink);
   line-height: 1.15;
@@ -1085,7 +1085,7 @@ html, body {
 
 .transport-city {
   font-family: var(--font);
-  font-size: 26px;
+  font-size: clamp(20px, 5.5vw, 26px);
   font-weight: 700;
   color: var(--ink);
   letter-spacing: -0.5px;
@@ -1330,3 +1330,45 @@ html, body {
 }
 
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== SAFE AREA INSETS (notched iPhones) ===== */
+.bottom-nav {
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+.welcome-content {
+  padding-bottom: max(clamp(48px, 10vw, 72px), calc(env(safe-area-inset-bottom) + 32px));
+}
+
+/* ===== TABLET / DESKTOP FRAME ===== */
+@media (min-width: 500px) {
+  html, body {
+    background: #080106;
+  }
+
+  .screen.active {
+    box-shadow:
+      0 0 0 1px var(--border-2),
+      0 30px 80px rgba(0,0,0,0.85);
+    margin-top: 20px;
+    min-height: calc(100dvh - 40px);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* fixed nav already constrained to 480px + centred — add bottom corners */
+  .bottom-nav {
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+/* ===== SMALL PHONES (≤ 360px) ===== */
+@media (max-width: 360px) {
+  .app-header { padding: 12px 14px; }
+  .day-cards-group { padding: 8px 10px; }
+  .rec-card-inner { padding: 12px; }
+  .activity-item { padding: 10px 12px; }
+  .section-hero-content { padding: 12px 14px; }
+  .trip-summary { padding: 12px 14px; }
+  .day-hero { padding: 20px 14px; }
+}
