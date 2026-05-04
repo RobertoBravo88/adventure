@@ -599,6 +599,60 @@ html, body {
 
 .rec-detail { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
 
+.rec-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 7px;
+  flex-wrap: wrap;
+}
+
+.stars-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.stars-filled { color: var(--accent); letter-spacing: 1px; }
+.stars-empty  { color: var(--border); letter-spacing: 1px; }
+
+.rating-num {
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.maps-link {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: opacity 0.15s;
+}
+
+.maps-link:hover { opacity: 0.7; }
+
+.rec-added-to {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 5px;
+}
+
+.rec-strip-rating { margin: 2px 0; }
+
+.rec-strip-maps {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+
 .rec-category-tag {
   display: inline-block;
   margin-top: 6px;
