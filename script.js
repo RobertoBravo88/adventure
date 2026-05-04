@@ -211,6 +211,11 @@ let dayRecCategory = "all";
 let likedRecs = new Set();
 let addedRecs = {};
 let customRecs = [];
+let trashedItems = {};
+let notesList = {};
+let noteSortBy = 'date';
+let noteSortDir = 'desc';
+let currentNoteId = null;
 
 // ===== FIREBASE =====
 firebase.initializeApp({
@@ -258,6 +263,8 @@ function refreshCurrentScreen() {
   const id = active.id;
   if (id === 'itinerary-screen') renderItinerary();
   if (id === 'discover-screen') renderDiscoverScreen();
+  if (id === 'notes-screen') renderNotesList();
+  if (id === 'trash-screen') renderTrashScreen();
   if (id === 'day-detail-screen') {
     const day = TRIP.days.find(d => d.id === currentDayId);
     if (day) renderDayDetail(day);
@@ -285,6 +292,14 @@ function initFirebase() {
     customRecs = snap.val() ? Object.values(snap.val()) : [];
     refreshCurrentScreen();
   });
+  tripRef.child('trash').on('value', snap => {
+    trashedItems = snap.val() || {};
+    if (document.querySelector('.screen.active')?.id === 'trash-screen') renderTrashScreen();
+  });
+  tripRef.child('notesList').on('value', snap => {
+    notesList = snap.val() || {};
+    if (document.querySelector('.screen.active')?.id === 'notes-screen') renderNotesList();
+  });
 }
 
 function findRec(recId) {
@@ -308,6 +323,8 @@ function showScreen(screenId) {
 
   if (screenId === 'discover-screen') renderDiscoverScreen();
   if (screenId === 'itinerary-screen') renderItinerary();
+  if (screenId === 'notes-screen') renderNotesList();
+  if (screenId === 'trash-screen') renderTrashScreen();
 
   // Sync nav active state
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -493,7 +510,7 @@ function renderDayRecStrip(day) {
   const strip = document.getElementById('day-rec-strip');
   strip.innerHTML = '';
 
-  const recs = RECOMMENDATIONS[day.city] || [];
+  const recs = getAllRecs(day.city);
   const filtered = dayRecCategory === 'all' ? recs : recs.filter(r => r.category === dayRecCategory);
 
   if (filtered.length === 0) {
@@ -749,9 +766,10 @@ function addCustomRec() {
   const detail = document.getElementById('new-rec-detail').value.trim();
   const mapsUrl = document.getElementById('new-rec-maps').value.trim() || null;
   const category = document.getElementById('new-rec-category').value;
+  const city = document.getElementById('new-rec-city').value;
   if (!name) { showToast('Add a name first'); return; }
   const id = `custom_${Date.now()}`;
-  tripRef.child(`customRecs/${id}`).set({ id, city: discoverCity, category, name, detail, mapsUrl, custom: true });
+  tripRef.child(`customRecs/${id}`).set({ id, city, category, name, detail, mapsUrl, custom: true });
   document.getElementById('new-rec-name').value = '';
   document.getElementById('new-rec-detail').value = '';
   document.getElementById('new-rec-maps').value = '';
@@ -759,10 +777,12 @@ function addCustomRec() {
 }
 
 function deleteCustomRec(id) {
+  const rec = customRecs.find(r => r.id === id);
+  if (rec) moveToTrash('customRec', rec);
   tripRef.child(`customRecs/${id}`).remove();
   if (addedRecs[id]) { delete addedRecs[id]; saveAddedRecs(); }
   if (likedRecs.has(id)) { likedRecs.delete(id); saveLikedRecs(); }
-  showToast('Removed');
+  showToast('Moved to trash');
 }
 
 // ===== GOOGLE MAPS URL PARSER =====
@@ -821,18 +841,17 @@ function deleteActivity(dayId, activityId) {
   const day = TRIP.days.find(d => d.id === dayId);
   if (!day) return;
   const act = day.activities.find(a => a.id === activityId);
-  // Clean up addedRecs tracking if it came from a recommendation
-  if (act?.recId) {
-    if (addedRecs[act.recId]) {
-      addedRecs[act.recId] = addedRecs[act.recId].filter(id => id !== dayId);
-      saveAddedRecs();
-    }
+  if (!act) return;
+  if (act.recId && addedRecs[act.recId]) {
+    addedRecs[act.recId] = addedRecs[act.recId].filter(id => id !== dayId);
+    saveAddedRecs();
   }
+  moveToTrash('activity', act, { dayId, dayTitle: day.title });
   day.activities = day.activities.filter(a => a.id !== activityId);
   saveDayState();
   renderDayDetail(day);
   renderItinerary();
-  showToast('Removed');
+  showToast('Moved to trash');
 }
 
 // ===== TRANSPORT =====
@@ -857,15 +876,172 @@ function renderTransport() {
   });
 }
 
-// ===== NOTES =====
-function renderNotes() {
-  document.getElementById('personal-message-display').textContent = TRIP.message;
-  // notes textarea populated by Firebase listener
+// ===== TRASH =====
+function moveToTrash(type, item, extra = {}) {
+  const id = `trash_${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
+  tripRef.child(`trash/${id}`).set({ id, type, item, ...extra, deletedAt: Date.now(), label: item.name || item.title || 'Item' });
 }
 
-function saveNotes() {
-  tripRef.child('notes').set(document.getElementById('shared-notes').value);
-  showToast('Notes saved ✓');
+function restoreFromTrash(trashId) {
+  const entry = trashedItems[trashId];
+  if (!entry) return;
+  if (entry.type === 'activity') {
+    const day = TRIP.days.find(d => d.id === entry.dayId);
+    if (day) { day.activities.push(entry.item); saveDayState(); showToast('Activity restored'); }
+    else showToast('Day no longer exists');
+  } else if (entry.type === 'customRec') {
+    tripRef.child(`customRecs/${entry.item.id}`).set(entry.item);
+    showToast('Place restored');
+  } else if (entry.type === 'note') {
+    tripRef.child(`notesList/${entry.item.id}`).set(entry.item);
+    showToast('Note restored');
+  }
+  tripRef.child(`trash/${trashId}`).remove();
+}
+
+function emptyTrash() {
+  if (!Object.keys(trashedItems).length) return;
+  if (confirm('Permanently delete everything in the trash?')) {
+    tripRef.child('trash').remove();
+    showToast('Trash emptied');
+  }
+}
+
+function renderTrashScreen() {
+  const content = document.getElementById('trash-content');
+  const items = Object.values(trashedItems).sort((a, b) => b.deletedAt - a.deletedAt);
+  if (items.length === 0) {
+    content.innerHTML = `<div class="empty-state" style="padding:60px 20px"><div class="empty-state-icon">⊘</div><div class="empty-state-text">Trash is empty</div></div>`;
+    return;
+  }
+  content.innerHTML = '';
+  const emptyBtn = document.createElement('button');
+  emptyBtn.className = 'btn-secondary';
+  emptyBtn.textContent = 'Empty trash';
+  emptyBtn.style.cssText = 'margin:16px;width:calc(100% - 32px);display:block';
+  emptyBtn.onclick = emptyTrash;
+  content.appendChild(emptyBtn);
+  items.forEach(entry => {
+    const typeLabel = entry.type === 'activity' ? 'Activity' : entry.type === 'customRec' ? 'Place' : 'Note';
+    const date = new Date(entry.deletedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const sub = entry.type === 'activity' && entry.dayTitle ? `Day: ${entry.dayTitle}` :
+                entry.type === 'customRec' ? `${entry.item?.city || ''} · ${entry.item?.category || ''}` : '';
+    const card = document.createElement('div');
+    card.className = 'trash-card';
+    card.innerHTML = `
+      <div class="trash-card-body">
+        <div class="trash-type">${typeLabel}</div>
+        <div class="trash-name">${entry.label}</div>
+        ${sub ? `<div class="trash-sub">${sub}</div>` : ''}
+        <div class="trash-date">Deleted ${date}</div>
+      </div>
+      <button class="btn-secondary small" onclick="restoreFromTrash('${entry.id}')">Restore</button>
+    `;
+    content.appendChild(card);
+  });
+}
+
+// ===== NOTES =====
+function renderNotesList() {
+  const container = document.getElementById('notes-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // Pinned message card
+  const pinned = document.createElement('div');
+  pinned.className = 'note-card special';
+  pinned.innerHTML = `<p class="note-label">Message for you ◇</p><p class="note-text">${TRIP.message}</p>`;
+  container.appendChild(pinned);
+
+  let notes = Object.values(notesList);
+  notes.sort((a, b) => {
+    if (noteSortBy === 'date') return noteSortDir === 'desc' ? b.updatedAt - a.updatedAt : a.updatedAt - b.updatedAt;
+    const cmp = (a.title || '').localeCompare(b.title || '');
+    return noteSortDir === 'asc' ? cmp : -cmp;
+  });
+
+  if (notes.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.style.padding = '30px 20px';
+    empty.innerHTML = `<div class="empty-state-text">No notes yet — tap + to add one</div>`;
+    container.appendChild(empty);
+    return;
+  }
+
+  notes.forEach(note => {
+    const date = new Date(note.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
+    const preview = (note.body || '').split('\n')[0].substring(0, 70);
+    const card = document.createElement('div');
+    card.className = 'note-list-card';
+    card.innerHTML = `
+      <div class="note-list-content" onclick="openNote('${note.id}')">
+        <div class="note-list-title">${note.title || 'Untitled'}</div>
+        ${preview ? `<div class="note-list-preview">${preview}</div>` : ''}
+        <div class="note-list-date">${date}</div>
+      </div>
+      <button class="note-delete-btn" onclick="deleteNote('${note.id}')">✕</button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function setNoteSort(by, dir) {
+  noteSortBy = by; noteSortDir = dir;
+  document.querySelectorAll('#notes-sort-bar .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sort === `${by}-${dir}`);
+  });
+  renderNotesList();
+}
+
+function openNewNote() {
+  currentNoteId = `note_${Date.now()}`;
+  document.getElementById('note-title-input').value = '';
+  document.getElementById('note-body-input').value = '';
+  document.getElementById('note-edit-header').textContent = 'New Note';
+  showScreen('note-edit-screen');
+}
+
+function openNote(noteId) {
+  const note = notesList[noteId];
+  if (!note) return;
+  currentNoteId = noteId;
+  document.getElementById('note-title-input').value = note.title || '';
+  document.getElementById('note-body-input').value = note.body || '';
+  document.getElementById('note-edit-header').textContent = 'Edit Note';
+  showScreen('note-edit-screen');
+}
+
+function saveCurrentNote() {
+  if (!currentNoteId) return;
+  const title = document.getElementById('note-title-input').value.trim();
+  const body = document.getElementById('note-body-input').value;
+  if (!title && !body.trim()) { showToast('Nothing to save'); return; }
+  const existing = notesList[currentNoteId];
+  tripRef.child(`notesList/${currentNoteId}`).set({
+    id: currentNoteId,
+    title: title || 'Untitled',
+    body,
+    createdAt: existing?.createdAt || Date.now(),
+    updatedAt: Date.now()
+  });
+  showToast('Note saved ✓');
+  showScreen('notes-screen');
+}
+
+function closeNoteEditor() { showScreen('notes-screen'); }
+
+function deleteNote(noteId) {
+  const note = notesList[noteId];
+  if (note) moveToTrash('note', note);
+  tripRef.child(`notesList/${noteId}`).remove();
+  showToast('Moved to trash');
+}
+
+function deleteCurrentNote() {
+  if (!currentNoteId) { showScreen('notes-screen'); return; }
+  deleteNote(currentNoteId);
+  showScreen('notes-screen');
 }
 
 // ===== STAR RATING =====

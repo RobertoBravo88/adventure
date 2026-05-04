@@ -28,7 +28,7 @@
     <header class="app-header">
       <button class="back-btn" onclick="showScreen('welcome-screen')">←</button>
       <h2 class="header-title">Our Itinerary</h2>
-      <div style="width:40px"></div>
+      <button class="icon-btn" onclick="showScreen('trash-screen')" title="Trash">⊘</button>
     </header>
     <div class="trip-summary">
       <div class="summary-item">
@@ -128,13 +128,17 @@
           <input type="text" id="new-rec-detail" placeholder="Why it's worth a visit" class="text-input" />
           <input type="text" id="new-rec-maps" placeholder="Google Maps URL (optional)" class="text-input" />
           <div class="add-rec-row">
+            <select id="new-rec-city" class="select-input">
+              <option value="rome">Rome</option>
+              <option value="florence">Florence</option>
+            </select>
             <select id="new-rec-category" class="select-input">
               <option value="sights">▣ Sight</option>
-              <option value="food">● Food & Drink</option>
+              <option value="food">● Food</option>
               <option value="experience">✦ Experience</option>
             </select>
-            <button class="btn-primary small" onclick="addCustomRec()">Add place</button>
           </div>
+          <button class="btn-primary small" style="width:100%;margin-top:2px" onclick="addCustomRec()">Add place</button>
         </div>
       </div>
     </div>
@@ -167,26 +171,48 @@
   <div id="notes-screen" class="screen">
     <header class="app-header">
       <button class="back-btn" onclick="showScreen('itinerary-screen')">←</button>
-      <h2 class="header-title">Our Notes</h2>
-      <div style="width:40px"></div>
+      <h2 class="header-title">Notes</h2>
+      <button class="icon-btn" onclick="openNewNote()" style="font-size:22px;font-weight:300;line-height:1">+</button>
     </header>
-    <div class="notes-content">
-      <div class="note-card special">
-        <p class="note-label">Message for you ♡</p>
-        <p class="note-text" id="personal-message-display">Loading...</p>
-      </div>
-      <div class="note-card">
-        <p class="note-label">Shared notes</p>
-        <textarea id="shared-notes" class="notes-textarea" placeholder="Packing list, reminders, wishes..."></textarea>
-        <button class="btn-secondary" onclick="saveNotes()">Save notes</button>
-      </div>
+    <div class="rec-filter-row padded" id="notes-sort-bar">
+      <button class="filter-btn active" data-sort="date-desc" onclick="setNoteSort('date','desc')">Newest</button>
+      <button class="filter-btn" data-sort="date-asc" onclick="setNoteSort('date','asc')">Oldest</button>
+      <button class="filter-btn" data-sort="title-asc" onclick="setNoteSort('title','asc')">A → Z</button>
+      <button class="filter-btn" data-sort="title-desc" onclick="setNoteSort('title','desc')">Z → A</button>
     </div>
+    <div class="notes-list" id="notes-list"></div>
     <nav class="bottom-nav">
       <button class="nav-btn" onclick="showScreen('itinerary-screen')"><span class="nav-icon">≡</span><span>Itinerary</span></button>
       <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✦</span><span>Discover</span></button>
       <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈</span><span>Transport</span></button>
       <button class="nav-btn active" onclick="showScreen('notes-screen')"><span class="nav-icon">◇</span><span>Notes</span></button>
     </nav>
+  </div>
+
+  <!-- ===== NOTE EDIT SCREEN ===== -->
+  <div id="note-edit-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="closeNoteEditor()">←</button>
+      <h2 class="header-title" id="note-edit-header">Note</h2>
+      <button class="icon-btn" onclick="deleteCurrentNote()" style="color:var(--ink-3);font-size:14px">✕</button>
+    </header>
+    <div class="note-editor">
+      <input type="text" id="note-title-input" placeholder="Title" class="note-title-input" />
+      <textarea id="note-body-input" class="note-body-input" placeholder="Write your note here..."></textarea>
+    </div>
+    <div class="note-editor-footer">
+      <button class="btn-primary" onclick="saveCurrentNote()" style="width:100%">Save note</button>
+    </div>
+  </div>
+
+  <!-- ===== TRASH SCREEN ===== -->
+  <div id="trash-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="showScreen('itinerary-screen')">←</button>
+      <h2 class="header-title">Trash</h2>
+      <div style="width:40px"></div>
+    </header>
+    <div class="trash-content" id="trash-content"></div>
   </div>
 
   <!-- ===== ADD TO DAY MODAL ===== -->
