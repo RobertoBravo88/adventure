@@ -221,6 +221,24 @@ function saveAddedRecs() {
   localStorage.setItem('adventure_added_recs', JSON.stringify(addedRecs));
 }
 
+function saveDayState() {
+  const state = {};
+  TRIP.days.forEach(day => { state[day.id] = day.activities; });
+  localStorage.setItem('adventure_day_state', JSON.stringify(state));
+}
+
+function loadDayState() {
+  try {
+    const state = JSON.parse(localStorage.getItem('adventure_day_state') || 'null');
+    if (!state) return;
+    TRIP.days.forEach(day => {
+      if (state[day.id]) day.activities = state[day.id];
+    });
+    const maxId = Math.max(0, ...Object.values(state).flat().map(a => a.id || 0));
+    if (maxId >= nextActivityId) nextActivityId = maxId + 1;
+  } catch(e) {}
+}
+
 // ===== SCREEN NAVIGATION =====
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -459,6 +477,7 @@ function addRecToCurrentDay(recId, btn) {
   btn.textContent = '✓ Added';
   btn.classList.add('added');
 
+  saveDayState();
   renderDayDetail(day);
   showToast(`Added to Day ${day.id} ✓`);
 }
@@ -613,6 +632,7 @@ function addRecFromModal(recId, dayId, rec) {
   addedRecs[recId].push(dayId);
   saveAddedRecs();
 
+  saveDayState();
   closeModal();
   renderDiscoverList();
   showToast(`Added to Day ${day.id} ✓`);
@@ -657,6 +677,7 @@ function addActivity() {
 
   day.activities.push({ id: nextActivityId++, type: typeSelect.value, name, detail: '', mapsUrl, liked: false });
   input.value = '';
+  saveDayState();
   renderDayDetail(day);
   renderItinerary();
   showToast(mapsUrl ? `"${name}" added from Maps ✓` : 'Added ✓');
@@ -668,6 +689,7 @@ function toggleLike(dayId, activityId) {
   const activity = day?.activities.find(a => a.id === activityId);
   if (!activity) return;
   activity.liked = !activity.liked;
+  saveDayState();
   renderDayDetail(day);
   if (activity.liked) showToast('Loved it ♡');
 }
@@ -685,6 +707,7 @@ function deleteActivity(dayId, activityId) {
     }
   }
   day.activities = day.activities.filter(a => a.id !== activityId);
+  saveDayState();
   renderDayDetail(day);
   renderItinerary();
   showToast('Removed');
@@ -768,6 +791,7 @@ function showToast(message) {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+  loadDayState();
   renderItinerary();
   renderTransport();
   renderNotes();
