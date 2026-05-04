@@ -208,35 +208,78 @@ let discoverCity = "rome";
 let discoverCategory = "all";
 let dayRecCategory = "all";
 
-// Liked recommendations — persisted to localStorage
-let likedRecs = new Set(JSON.parse(localStorage.getItem('adventure_liked_recs') || '[]'));
-// Map of recId → array of dayIds it's been added to
-let addedRecs = JSON.parse(localStorage.getItem('adventure_added_recs') || '{}');
+let likedRecs = new Set();
+let addedRecs = {};
+
+// ===== FIREBASE =====
+firebase.initializeApp({
+  apiKey: "AIzaSyBg7HQAAJu-yJeTQYQqiVZyFj4pvPodY00",
+  authDomain: "adventure-e81b9.firebaseapp.com",
+  databaseURL: "https://adventure-e81b9-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "adventure-e81b9",
+  storageBucket: "adventure-e81b9.firebasestorage.app",
+  messagingSenderId: "710419058727",
+  appId: "1:710419058727:web:a3e6117cd13ceb5321fe02"
+});
+const db = firebase.database();
+const tripRef = db.ref('trip');
 
 function saveLikedRecs() {
-  localStorage.setItem('adventure_liked_recs', JSON.stringify([...likedRecs]));
+  tripRef.child('likedRecs').set([...likedRecs]);
 }
 
 function saveAddedRecs() {
-  localStorage.setItem('adventure_added_recs', JSON.stringify(addedRecs));
+  tripRef.child('addedRecs').set(addedRecs);
 }
 
 function saveDayState() {
   const state = {};
   TRIP.days.forEach(day => { state[day.id] = day.activities; });
-  localStorage.setItem('adventure_day_state', JSON.stringify(state));
+  tripRef.child('dayState').set(state);
 }
 
-function loadDayState() {
-  try {
-    const state = JSON.parse(localStorage.getItem('adventure_day_state') || 'null');
-    if (!state) return;
-    TRIP.days.forEach(day => {
-      if (state[day.id]) day.activities = state[day.id];
-    });
-    const maxId = Math.max(0, ...Object.values(state).flat().map(a => a.id || 0));
+function applyDayState(state) {
+  if (!state) return;
+  TRIP.days.forEach(day => {
+    const saved = state[day.id] || state[String(day.id)];
+    if (saved) day.activities = saved;
+  });
+  const all = Object.values(state).flat().filter(Boolean);
+  if (all.length) {
+    const maxId = Math.max(0, ...all.map(a => a.id || 0));
     if (maxId >= nextActivityId) nextActivityId = maxId + 1;
-  } catch(e) {}
+  }
+}
+
+function refreshCurrentScreen() {
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+  const id = active.id;
+  if (id === 'itinerary-screen') renderItinerary();
+  if (id === 'discover-screen') renderDiscoverScreen();
+  if (id === 'day-detail-screen') {
+    const day = TRIP.days.find(d => d.id === currentDayId);
+    if (day) renderDayDetail(day);
+  }
+}
+
+function initFirebase() {
+  tripRef.child('likedRecs').on('value', snap => {
+    likedRecs = new Set(snap.val() || []);
+    refreshCurrentScreen();
+  });
+  tripRef.child('addedRecs').on('value', snap => {
+    addedRecs = snap.val() || {};
+    refreshCurrentScreen();
+  });
+  tripRef.child('dayState').on('value', snap => {
+    applyDayState(snap.val());
+    refreshCurrentScreen();
+  });
+  tripRef.child('notes').on('value', snap => {
+    const el = document.getElementById('shared-notes');
+    if (el && document.activeElement !== el) el.value = snap.val() || '';
+  });
 }
 
 // ===== SCREEN NAVIGATION =====
@@ -758,12 +801,11 @@ function renderTransport() {
 // ===== NOTES =====
 function renderNotes() {
   document.getElementById('personal-message-display').textContent = TRIP.message;
-  const saved = localStorage.getItem('adventure_notes');
-  if (saved) document.getElementById('shared-notes').value = saved;
+  // notes textarea populated by Firebase listener
 }
 
 function saveNotes() {
-  localStorage.setItem('adventure_notes', document.getElementById('shared-notes').value);
+  tripRef.child('notes').set(document.getElementById('shared-notes').value);
   showToast('Notes saved ✓');
 }
 
@@ -811,7 +853,7 @@ function showToast(message) {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
-  loadDayState();
+  initFirebase();
   renderItinerary();
   renderTransport();
   renderNotes();
