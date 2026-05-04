@@ -165,39 +165,39 @@ const TRANSPORT = [
 // ===== RECOMMENDATIONS =====
 const RECOMMENDATIONS = {
   rome: [
-    { id: "r1",  category: "sights",     name: "Colosseum & Roman Forum",        detail: "The heart of ancient Rome — book online to skip queues",                rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Colosseum+Rome" },
-    { id: "r2",  category: "sights",     name: "Pantheon",                        detail: "2,000 years old and perfectly preserved — visit at opening",             rating: 4.8, mapsUrl: "https://www.google.com/maps/search/Pantheon+Rome" },
-    { id: "r3",  category: "sights",     name: "Vatican Museums & Sistine Chapel", detail: "Book early — the most visited museum in the world",                      rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Vatican+Museums+Rome" },
-    { id: "r4",  category: "sights",     name: "St. Peter's Basilica",            detail: "Free entry — climb the dome for panoramic views of Rome",                rating: 4.9, mapsUrl: "https://www.google.com/maps/search/St+Peters+Basilica+Rome" },
-    { id: "r5",  category: "sights",     name: "Trevi Fountain at dawn",          detail: "Visit early to avoid the crowds — throw a coin ♡",                      rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Trevi+Fountain+Rome" },
-    { id: "r6",  category: "sights",     name: "Borghese Gallery",                detail: "Bernini sculptures up close — must book weeks ahead",                    rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Borghese+Gallery+Rome" },
-    { id: "r7",  category: "sights",     name: "Castel Sant'Angelo",              detail: "Former papal fortress with great views from the top",                    rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Castel+Sant+Angelo+Rome" },
-    { id: "r8",  category: "food",       name: "Cacio e pepe at Da Enzo al 29",   detail: "Classic Roman pasta in the heart of Trastevere",                         rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Da+Enzo+al+29+Rome" },
-    { id: "r9",  category: "food",       name: "Supplì Roma",                     detail: "The best Roman street snack — fried rice balls",                         rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Suppli+Roma+Trastevere" },
-    { id: "r10", category: "food",       name: "Gelato at Fatamorgana",           detail: "Creative artisan gelato — try the unusual flavours",                     rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Fatamorgana+gelato+Rome+Trastevere" },
-    { id: "r11", category: "food",       name: "Aperitivo at Campo de' Fiori",    detail: "Lively piazza perfect for evening drinks",                               rating: 4.4, mapsUrl: "https://www.google.com/maps/search/Campo+de+Fiori+Rome" },
-    { id: "r12", category: "food",       name: "Dinner in Trastevere",            detail: "Most romantic neighbourhood in Rome — perfect for a date night ♡",      rating: 4.7, mapsUrl: "https://www.google.com/maps/search/restaurants+Trastevere+Rome" },
-    { id: "r13", category: "experience", name: "Sunset on Janiculum Hill",        detail: "Best panoramic view of Rome — magical at golden hour",                   rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Janiculum+Hill+Rome" },
-    { id: "r14", category: "experience", name: "Morning espresso at a bar",       detail: "Stand at the bar, order an espresso, live like a Roman",                 rating: 4.5, mapsUrl: "https://www.google.com/maps/search/best+espresso+bar+Rome" },
-    { id: "r15", category: "experience", name: "Explore the Jewish Ghetto",       detail: "Ancient, atmospheric neighbourhood with incredible food",                 rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Jewish+Ghetto+Rome" },
-    { id: "r16", category: "experience", name: "Evening stroll along the Tiber",  detail: "Walk from Trastevere to Castel Sant'Angelo at dusk",                     rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Tiber+River+walk+Rome" },
+    { id: "r1",  category: "sights",     name: "Colosseum & Roman Forum",        detail: "The heart of ancient Rome — book online to skip queues",                rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Colosseum+Rome",                      photo: "upGZ5p92SHU" },
+    { id: "r2",  category: "sights",     name: "Pantheon",                        detail: "2,000 years old and perfectly preserved — visit at opening",             rating: 4.8, mapsUrl: "https://www.google.com/maps/search/Pantheon+Rome",                       photo: "JbHQ8g_LMSU" },
+    { id: "r3",  category: "sights",     name: "Vatican Museums & Sistine Chapel", detail: "Book early — the most visited museum in the world",                     rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Vatican+Museums+Rome",              photo: "TWo2ZSrtNaQ" },
+    { id: "r4",  category: "sights",     name: "St. Peter's Basilica",            detail: "Free entry — climb the dome for panoramic views of Rome",                rating: 4.9, mapsUrl: "https://www.google.com/maps/search/St+Peters+Basilica+Rome",           photo: "MhsbGLnvjdU" },
+    { id: "r5",  category: "sights",     name: "Trevi Fountain at dawn",          detail: "Visit early to avoid the crowds — throw a coin ♡",                      rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Trevi+Fountain+Rome",                photo: "LfvMS4zG1Do" },
+    { id: "r6",  category: "sights",     name: "Borghese Gallery",                detail: "Bernini sculptures up close — must book weeks ahead",                    rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Borghese+Gallery+Rome",              photo: "ctIUEFtJD58" },
+    { id: "r7",  category: "sights",     name: "Castel Sant'Angelo",              detail: "Former papal fortress with great views from the top",                    rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Castel+Sant+Angelo+Rome",            photo: "0RaZmPQQQrA" },
+    { id: "r8",  category: "food",       name: "Cacio e pepe at Da Enzo al 29",   detail: "Classic Roman pasta in the heart of Trastevere",                         rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Da+Enzo+al+29+Rome",                photo: "4nXkhLCrkLo" },
+    { id: "r9",  category: "food",       name: "Supplì Roma",                     detail: "The best Roman street snack — fried rice balls",                         rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Suppli+Roma+Trastevere",             photo: "A_fT7FIQCWc" },
+    { id: "r10", category: "food",       name: "Gelato at Fatamorgana",           detail: "Creative artisan gelato — try the unusual flavours",                     rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Fatamorgana+gelato+Rome+Trastevere",  photo: "YXiLfcWGOcw" },
+    { id: "r11", category: "food",       name: "Aperitivo at Campo de' Fiori",    detail: "Lively piazza perfect for evening drinks",                               rating: 4.4, mapsUrl: "https://www.google.com/maps/search/Campo+de+Fiori+Rome",                photo: "o-P1tWo7Q_Y" },
+    { id: "r12", category: "food",       name: "Dinner in Trastevere",            detail: "Most romantic neighbourhood in Rome — perfect for a date night ♡",      rating: 4.7, mapsUrl: "https://www.google.com/maps/search/restaurants+Trastevere+Rome",       photo: "a85RiUfXtw8" },
+    { id: "r13", category: "experience", name: "Sunset on Janiculum Hill",        detail: "Best panoramic view of Rome — magical at golden hour",                   rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Janiculum+Hill+Rome",               photo: "ZXlo2b8qNbM" },
+    { id: "r14", category: "experience", name: "Morning espresso at a bar",       detail: "Stand at the bar, order an espresso, live like a Roman",                 rating: 4.5, mapsUrl: "https://www.google.com/maps/search/best+espresso+bar+Rome",            photo: "yCdPU73kGSc" },
+    { id: "r15", category: "experience", name: "Explore the Jewish Ghetto",       detail: "Ancient, atmospheric neighbourhood with incredible food",                 rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Jewish+Ghetto+Rome",               photo: "sGEAohYY8Ds" },
+    { id: "r16", category: "experience", name: "Evening stroll along the Tiber",  detail: "Walk from Trastevere to Castel Sant'Angelo at dusk",                     rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Tiber+River+walk+Rome",            photo: "eCvdIQSvC68" },
   ],
   florence: [
-    { id: "f1",  category: "sights",     name: "Uffizi Gallery",                  detail: "Botticelli's Birth of Venus — book well in advance",                     rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Uffizi+Gallery+Florence" },
-    { id: "f2",  category: "sights",     name: "Florence Cathedral & Dome Climb", detail: "Brunelleschi's dome — book the climb for breathtaking views",            rating: 4.8, mapsUrl: "https://www.google.com/maps/search/Florence+Cathedral+Duomo" },
-    { id: "f3",  category: "sights",     name: "Accademia — Michelangelo's David", detail: "The real thing is absolutely breathtaking — book ahead",                 rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Accademia+Gallery+Florence" },
-    { id: "f4",  category: "sights",     name: "Boboli Gardens",                  detail: "Beautiful Renaissance gardens behind Palazzo Pitti",                     rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Boboli+Gardens+Florence" },
-    { id: "f5",  category: "sights",     name: "Palazzo Vecchio",                 detail: "The old town hall — great views from the tower",                         rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Palazzo+Vecchio+Florence" },
-    { id: "f6",  category: "food",       name: "Bistecca Fiorentina — Il Latini", detail: "The iconic Florentine T-bone in a legendary trattoria",                  rating: 4.3, mapsUrl: "https://www.google.com/maps/search/Il+Latini+Florence" },
-    { id: "f7",  category: "food",       name: "Mercato Centrale lunch",          detail: "The best food market in Florence — incredible variety",                  rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Mercato+Centrale+Florence" },
-    { id: "f8",  category: "food",       name: "Gelato at Gelateria dei Neri",    detail: "Local favourite on Via dei Neri — try the ricotta and fig",              rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Gelateria+dei+Neri+Florence" },
-    { id: "f9",  category: "food",       name: "Aperitivo in Oltrarno",           detail: "The artisan quarter across the river — cool local bars",                 rating: 4.6, mapsUrl: "https://www.google.com/maps/search/aperitivo+bars+Oltrarno+Florence" },
-    { id: "f10", category: "food",       name: "Lampredotto sandwich",            detail: "Classic Florentine street food — adventurous and delicious",             rating: 4.5, mapsUrl: "https://www.google.com/maps/search/lampredotto+Florence+street+food" },
-    { id: "f11", category: "experience", name: "Sunset at Piazzale Michelangelo", detail: "The most beautiful view of Florence — go early for a spot ♡",           rating: 4.8, mapsUrl: "https://www.google.com/maps/search/Piazzale+Michelangelo+Florence" },
-    { id: "f12", category: "experience", name: "Ponte Vecchio at dawn",           detail: "The famous bridge without the crowds — truly magical",                   rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Ponte+Vecchio+Florence" },
-    { id: "f13", category: "experience", name: "Day trip to Fiesole",             detail: "Hilltop village 20 min by bus — stunning valley views",                  rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Fiesole+Florence" },
-    { id: "f14", category: "experience", name: "Artisan workshops in Oltrarno",   detail: "Leatherwork, gold jewellery, bookbinding — unique to Florence",          rating: 4.6, mapsUrl: "https://www.google.com/maps/search/artisan+workshops+Oltrarno+Florence" },
-    { id: "f15", category: "experience", name: "Walk across Ponte Santa Trinita", detail: "Less touristy than Ponte Vecchio — beautiful views along the Arno",      rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Ponte+Santa+Trinita+Florence" },
+    { id: "f1",  category: "sights",     name: "Uffizi Gallery",                  detail: "Botticelli's Birth of Venus — book well in advance",                     rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Uffizi+Gallery+Florence",           photo: "RrofBOkgeTA" },
+    { id: "f2",  category: "sights",     name: "Florence Cathedral & Dome Climb", detail: "Brunelleschi's dome — book the climb for breathtaking views",            rating: 4.8, mapsUrl: "https://www.google.com/maps/search/Florence+Cathedral+Duomo",          photo: "zMFxCtkn9vI" },
+    { id: "f3",  category: "sights",     name: "Accademia — Michelangelo's David", detail: "The real thing is absolutely breathtaking — book ahead",                 rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Accademia+Gallery+Florence",       photo: "hH6IAUtVLQw" },
+    { id: "f4",  category: "sights",     name: "Boboli Gardens",                  detail: "Beautiful Renaissance gardens behind Palazzo Pitti",                     rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Boboli+Gardens+Florence",           photo: "nGi9uWa-GOE" },
+    { id: "f5",  category: "sights",     name: "Palazzo Vecchio",                 detail: "The old town hall — great views from the tower",                         rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Palazzo+Vecchio+Florence",           photo: "olRKDPQfCS0" },
+    { id: "f6",  category: "food",       name: "Bistecca Fiorentina — Il Latini", detail: "The iconic Florentine T-bone in a legendary trattoria",                  rating: 4.3, mapsUrl: "https://www.google.com/maps/search/Il+Latini+Florence",                photo: "dBwadhWa-lI" },
+    { id: "f7",  category: "food",       name: "Mercato Centrale lunch",          detail: "The best food market in Florence — incredible variety",                  rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Mercato+Centrale+Florence",         photo: "I1vKuqoq_sA" },
+    { id: "f8",  category: "food",       name: "Gelato at Gelateria dei Neri",    detail: "Local favourite on Via dei Neri — try the ricotta and fig",              rating: 4.5, mapsUrl: "https://www.google.com/maps/search/Gelateria+dei+Neri+Florence",       photo: "PyKDp7mittw" },
+    { id: "f9",  category: "food",       name: "Aperitivo in Oltrarno",           detail: "The artisan quarter across the river — cool local bars",                 rating: 4.6, mapsUrl: "https://www.google.com/maps/search/aperitivo+bars+Oltrarno+Florence",  photo: "5R5zxf23u5k" },
+    { id: "f10", category: "food",       name: "Lampredotto sandwich",            detail: "Classic Florentine street food — adventurous and delicious",             rating: 4.5, mapsUrl: "https://www.google.com/maps/search/lampredotto+Florence+street+food",  photo: "R0y_bEL-NP0" },
+    { id: "f11", category: "experience", name: "Sunset at Piazzale Michelangelo", detail: "The most beautiful view of Florence — go early for a spot ♡",           rating: 4.8, mapsUrl: "https://www.google.com/maps/search/Piazzale+Michelangelo+Florence",   photo: "AVQUqyNYZMM" },
+    { id: "f12", category: "experience", name: "Ponte Vecchio at dawn",           detail: "The famous bridge without the crowds — truly magical",                   rating: 4.7, mapsUrl: "https://www.google.com/maps/search/Ponte+Vecchio+Florence",            photo: "JnTdxjelx6E" },
+    { id: "f13", category: "experience", name: "Day trip to Fiesole",             detail: "Hilltop village 20 min by bus — stunning valley views",                  rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Fiesole+Florence",                  photo: "3M39iiCUdlc" },
+    { id: "f14", category: "experience", name: "Artisan workshops in Oltrarno",   detail: "Leatherwork, gold jewellery, bookbinding — unique to Florence",          rating: 4.6, mapsUrl: "https://www.google.com/maps/search/artisan+workshops+Oltrarno+Florence", photo: "Z6bJJEhzByc" },
+    { id: "f15", category: "experience", name: "Walk across Ponte Santa Trinita", detail: "Less touristy than Ponte Vecchio — beautiful views along the Arno",      rating: 4.6, mapsUrl: "https://www.google.com/maps/search/Ponte+Santa+Trinita+Florence",      photo: "ovnuvwRxYJo" },
   ]
 };
 
@@ -341,6 +341,7 @@ function renderDayDetail(day) {
         <div class="activity-body">
           <div class="activity-name">${activity.name}</div>
           ${activity.detail ? `<div class="activity-detail">${activity.detail}</div>` : ''}
+          ${activity.mapsUrl ? `<a href="${activity.mapsUrl}" target="_blank" class="maps-link" style="font-size:11px;margin-top:3px;display:inline-block">View on Maps ↗</a>` : ''}
         </div>
         <div class="activity-actions">
           <button class="like-btn ${activity.liked ? 'liked' : ''}" onclick="toggleLike(${day.id}, ${activity.id})">♡</button>
@@ -406,16 +407,20 @@ function renderDayRecStrip(day) {
 
     const card = document.createElement('div');
     card.className = 'rec-strip-card';
+    const photoUrl = rec.photo ? `https://images.unsplash.com/photo-${rec.photo}?w=320&q=80&auto=format&fit=crop` : '';
     card.innerHTML = `
-      <div class="rec-strip-name">${rec.name}</div>
-      <div class="rec-strip-detail">${rec.detail}</div>
-      <div class="rec-strip-rating">${renderStars(rec.rating)}</div>
-      <a href="${rec.mapsUrl}" target="_blank" class="rec-strip-maps">Maps ↗</a>
-      <div class="rec-strip-actions">
-        <button class="rec-strip-like ${isLiked ? 'liked' : ''}" onclick="toggleRecLike('${rec.id}', this)">♡</button>
-        <button class="rec-strip-add ${isAdded ? 'added' : ''}" onclick="addRecToCurrentDay('${rec.id}', this)">
-          ${isAdded ? '✓ Added' : '+ Add'}
-        </button>
+      ${photoUrl ? `<img class="rec-strip-photo" src="${photoUrl}" alt="${rec.name}" onerror="this.style.display='none'">` : ''}
+      <div class="rec-strip-inner">
+        <div class="rec-strip-name">${rec.name}</div>
+        <div class="rec-strip-detail">${rec.detail}</div>
+        <div class="rec-strip-rating">${renderStars(rec.rating)}</div>
+        <a href="${rec.mapsUrl}" target="_blank" class="rec-strip-maps">Maps ↗</a>
+        <div class="rec-strip-actions">
+          <button class="rec-strip-like ${isLiked ? 'liked' : ''}" onclick="toggleRecLike('${rec.id}', this)">♡</button>
+          <button class="rec-strip-add ${isAdded ? 'added' : ''}" onclick="addRecToCurrentDay('${rec.id}', this)">
+            ${isAdded ? '✓ Added' : '+ Add'}
+          </button>
+        </div>
       </div>
     `;
     strip.appendChild(card);
@@ -504,19 +509,23 @@ function renderDiscoverList() {
 
     const card = document.createElement('div');
     card.className = 'rec-card';
+    const photoUrl = rec.photo ? `https://images.unsplash.com/photo-${rec.photo}?w=600&q=80&auto=format&fit=crop` : '';
     card.innerHTML = `
-      <div class="rec-body">
-        <div class="rec-name">${rec.name}</div>
-        <div class="rec-detail">${rec.detail}</div>
-        <div class="rec-meta">
-          ${renderStars(rec.rating)}
-          <a href="${rec.mapsUrl}" target="_blank" class="maps-link">View on Maps ↗</a>
+      ${photoUrl ? `<img class="rec-photo" src="${photoUrl}" alt="${rec.name}" onerror="this.style.display='none'">` : ''}
+      <div class="rec-card-inner">
+        <div class="rec-body">
+          <div class="rec-name">${rec.name}</div>
+          <div class="rec-detail">${rec.detail}</div>
+          <div class="rec-meta">
+            ${renderStars(rec.rating)}
+            <a href="${rec.mapsUrl}" target="_blank" class="maps-link">View on Maps ↗</a>
+          </div>
+          ${addedDays.length ? `<div class="rec-added-to">Added to: ${addedDays.join(', ')}</div>` : ''}
         </div>
-        ${addedDays.length ? `<div class="rec-added-to">Added to: ${addedDays.join(', ')}</div>` : ''}
-      </div>
-      <div class="rec-actions">
-        <button class="rec-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleRecLike('${rec.id}', this)">♡</button>
-        <button class="rec-add-btn" onclick="openAddToDay('${rec.id}')">+ Add</button>
+        <div class="rec-actions">
+          <button class="rec-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleRecLike('${rec.id}', this)">♡</button>
+          <button class="rec-add-btn" onclick="openAddToDay('${rec.id}')">+ Add</button>
+        </div>
       </div>
     `;
     list.appendChild(card);
@@ -559,8 +568,7 @@ function openAddToDay(recId) {
 
   document.getElementById('modal-rec-name').textContent = rec.name;
 
-  // Show only days that match the city (or days with no city for context)
-  const relevantDays = TRIP.days.filter(d => d.city === city || d.city === null);
+  const relevantDays = TRIP.days.filter(d => d.city === city);
   const modalDays = document.getElementById('modal-days');
   modalDays.innerHTML = '';
 
@@ -615,21 +623,43 @@ function closeModal() {
   modalRecId = null;
 }
 
+// ===== GOOGLE MAPS URL PARSER =====
+function parseMapsUrl(url) {
+  try {
+    const placeMatch = url.match(/\/maps\/place\/([^/@?#]+)/);
+    if (placeMatch) return decodeURIComponent(placeMatch[1].replace(/\+/g, ' ')).replace(/_/g, ' ');
+    const searchMatch = url.match(/\/maps\/search\/([^/@?#]+)/);
+    if (searchMatch) return decodeURIComponent(searchMatch[1].replace(/\+/g, ' '));
+    const qMatch = url.match(/[?&]q=([^&]+)/);
+    if (qMatch) return decodeURIComponent(qMatch[1].replace(/\+/g, ' '));
+  } catch(e) {}
+  return null;
+}
+
 // ===== ADD CUSTOM ACTIVITY =====
 function addActivity() {
   const input = document.getElementById('new-activity-input');
   const typeSelect = document.getElementById('new-activity-type');
-  const name = input.value.trim();
-  if (!name) { showToast('Please type something first'); return; }
+  const raw = input.value.trim();
+  if (!raw) { showToast('Please type something first'); return; }
 
   const day = TRIP.days.find(d => d.id === currentDayId);
   if (!day) return;
 
-  day.activities.push({ id: nextActivityId++, type: typeSelect.value, name, detail: '', liked: false });
+  let name = raw;
+  let mapsUrl = null;
+
+  if (raw.includes('google.com/maps') || raw.includes('maps.google.com') || raw.includes('goo.gl/maps')) {
+    const extracted = parseMapsUrl(raw);
+    name = extracted || 'Place from Maps';
+    mapsUrl = raw;
+  }
+
+  day.activities.push({ id: nextActivityId++, type: typeSelect.value, name, detail: '', mapsUrl, liked: false });
   input.value = '';
   renderDayDetail(day);
   renderItinerary();
-  showToast('Added ✓');
+  showToast(mapsUrl ? `"${name}" added from Maps ✓` : 'Added ✓');
 }
 
 // ===== TOGGLE LIKE (itinerary item) =====
