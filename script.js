@@ -13,8 +13,8 @@ const TRIP = {
       date: "Wed, May 13",
       city: null,
       activities: [
-        { id: 1, type: "transport", name: "Drive after work to Rekken", detail: "Heading to the Netherlands ♡", liked: false },
-        { id: 2, type: "hotel",    name: "Stay with Robert's brother", detail: "Eibergen — home base for the night", liked: false },
+        { id: 1, type: "car",   name: "Drive after work to Rekken", detail: "Heading to the Netherlands ♡", liked: false },
+        { id: 2, type: "sleep", name: "Stay with Robert's brother", detail: "Eibergen — home base for the night", liked: false },
       ]
     },
     {
@@ -23,8 +23,8 @@ const TRIP = {
       date: "Thu, May 14",
       city: null,
       activities: [
-        { id: 3, type: "transport", name: "Drive Eibergen → Wrocław", detail: "With Robert's brother — long drive, good vibes", liked: false },
-        { id: 4, type: "hotel",    name: "Hotel in Wrocław", detail: "Details to be added", liked: false },
+        { id: 3, type: "car",   name: "Drive Eibergen → Wrocław", detail: "With Robert's brother — long drive, good vibes", liked: false },
+        { id: 4, type: "sleep", name: "Hotel in Wrocław", detail: "Details to be added", liked: false },
       ]
     },
     {
@@ -33,8 +33,8 @@ const TRIP = {
       date: "Fri, May 15",
       city: null,
       activities: [
-        { id: 5, type: "transport", name: "Drive Wrocław → Wedding Venue", detail: "Wrocławska 111, 55-114 Pierwoszów · 30 min north of Wrocław", liked: false },
-        { id: 6, type: "hotel",    name: "Check in at venue from 15:00", detail: "Collect keys at reception", liked: false },
+        { id: 5, type: "car",      name: "Drive Wrocław → Wedding Venue", detail: "Wrocławska 111, 55-114 Pierwoszów · 30 min north of Wrocław", liked: false },
+        { id: 6, type: "sleep",    name: "Check in at venue from 15:00", detail: "Collect keys at reception", liked: false },
         { id: 7, type: "activity", name: "Explore the venue & countryside", detail: "Enjoy the calm before the celebration ♡", liked: false },
       ]
     },
@@ -44,11 +44,11 @@ const TRIP = {
       date: "Sat, May 16",
       city: null,
       activities: [
-        { id: 8,  type: "activity", name: "15:50 — Take your seats", detail: "Ceremony behind the main building", liked: false },
-        { id: 9,  type: "activity", name: "16:00 — Wedding Ceremony 💍", detail: "Joanna & Eric exchange vows", liked: true },
+        { id: 8,  type: "ceremony", name: "15:50 — Take your seats", detail: "Ceremony behind the main building", liked: false },
+        { id: 9,  type: "ceremony", name: "16:00 — Wedding Ceremony", detail: "Joanna & Eric exchange vows", liked: true },
         { id: 10, type: "food",     name: "17:00 — Wedding Dinner", detail: "Recharge and enjoy a lovely meal together", liked: false },
-        { id: 11, type: "food",     name: "18:30 — Wedding Cake 🎂", detail: "Watch them cut the cake", liked: false },
-        { id: 12, type: "activity", name: "19:00 – 04:00 — Party! 🎶", detail: "Dance until your feet hurt", liked: true },
+        { id: 11, type: "food",     name: "18:30 — Wedding Cake", detail: "Watch them cut the cake", liked: false },
+        { id: 12, type: "party",    name: "19:00 – 04:00 — Party!", detail: "Dance until your feet hurt", liked: true },
         { id: 13, type: "note",     name: "Dress code: Tenue de Ville", detail: "Suit with tie · Cocktail dress or pant suit", liked: false },
       ]
     },
@@ -58,9 +58,9 @@ const TRIP = {
       date: "Sun, May 17",
       city: null,
       activities: [
-        { id: 14, type: "food",  name: "09:00 – 11:00 — Wedding Breakfast", detail: "Stories and laughter from the night before ♡", liked: false },
-        { id: 15, type: "note",  name: "Check out by 11:30", detail: "Pack the night before if possible", liked: false },
-        { id: 16, type: "activity", name: "Relax, recover, reminisce ♡", detail: "Take it slow today — you earned it", liked: true },
+        { id: 14, type: "food",     name: "09:00 – 11:00 — Wedding Breakfast", detail: "Stories and laughter from the night before ♡", liked: false },
+        { id: 15, type: "note",     name: "Check out by 11:30", detail: "Pack the night before if possible", liked: false },
+        { id: 16, type: "activity", name: "Relax, recover, reminisce", detail: "Take it slow today — you earned it", liked: true },
       ]
     },
     {
@@ -69,8 +69,8 @@ const TRIP = {
       date: "Mon, May 18",
       city: null,
       activities: [
-        { id: 17, type: "transport", name: "FR2113 · Wrocław → Rome Ciampino", detail: "Departs 11:15 · Arrives 13:15 · Booking: J6K6FX", liked: false },
-        { id: 18, type: "hotel",    name: "Check in — The Social Hub Rome", detail: "Viale dello Scalo San Lorenzo, 10, 00185 · From 15:00", liked: false },
+        { id: 17, type: "flight", name: "FR2113 · Wrocław → Rome Ciampino", detail: "Departs 11:15 · Arrives 13:15 · Booking: J6K6FX", liked: false },
+        { id: 18, type: "sleep",  name: "Check in — The Social Hub Rome", detail: "Viale dello Scalo San Lorenzo, 10, 00185 · From 15:00", liked: false },
       ]
     },
     {
@@ -93,9 +93,9 @@ const TRIP = {
       date: "Thu, May 21",
       city: "rome",
       activities: [
-        { id: 19, type: "transport", name: "Check out The Social Hub", detail: "Check-out by 12:00 — store luggage at reception if needed", liked: false },
-        { id: 20, type: "transport", name: "Train Roma Termini → Firenze SMN", detail: "Frecciarossa · ~1h 40min · Book at Trenitalia.com", liked: false },
-        { id: 21, type: "hotel",    name: "Check in — Hotel Palazzo Borghini", detail: "Via Vincenzo Borghini, 23, 50133 Florence · From 15:00", liked: false },
+        { id: 19, type: "note",   name: "Check out The Social Hub", detail: "Check-out by 12:00 — store luggage at reception if needed", liked: false },
+        { id: 20, type: "train",  name: "Train Roma Termini → Firenze SMN", detail: "Frecciarossa · ~1h 40min · Book at Trenitalia.com", liked: false },
+        { id: 21, type: "sleep",  name: "Check in — Hotel Palazzo Borghini", detail: "Via Vincenzo Borghini, 23, 50133 Florence · From 15:00", liked: false },
       ]
     },
     {
@@ -125,10 +125,10 @@ const TRIP = {
       date: "Mon, May 25",
       city: null,
       activities: [
-        { id: 22, type: "note",     name: "Check out Hotel Palazzo Borghini", detail: "Check-out 07:00 – 11:00 — early start today", liked: false },
-        { id: 23, type: "transport", name: "Train Florence → Bologna Centrale", detail: "Frecciarossa · ~35 min · Book at Trenitalia.com", liked: false },
-        { id: 24, type: "transport", name: "FR4863 · Bologna → Brussels Charleroi", detail: "Departs 16:35 · Arrives 18:20 · Booking: T8L9GE", liked: false },
-        { id: 25, type: "note",     name: "Home sweet home ♡", detail: "What an adventure — already looking forward to the next one", liked: true },
+        { id: 22, type: "note",   name: "Check out Hotel Palazzo Borghini", detail: "Check-out 07:00 – 11:00 — early start today", liked: false },
+        { id: 23, type: "train",  name: "Train Florence → Bologna Centrale", detail: "Frecciarossa · ~35 min · Book at Trenitalia.com", liked: false },
+        { id: 24, type: "flight", name: "FR4863 · Bologna → Brussels Charleroi", detail: "Departs 16:35 · Arrives 18:20 · Booking: T8L9GE", liked: false },
+        { id: 25, type: "note",   name: "Home sweet home ♡", detail: "What an adventure — already looking forward to the next one", liked: true },
       ]
     },
   ]
@@ -268,7 +268,22 @@ function renderItinerary() {
   const container = document.getElementById('days-container');
   container.innerHTML = '';
 
+  const sections = [
+    { label: 'The Wedding', emoji: '💍', dayIds: [1, 2, 3, 4, 5] },
+    { label: 'Rome',        emoji: '🏛', dayIds: [6, 7, 8, 9] },
+    { label: 'Florence',    emoji: '⛪', dayIds: [10, 11, 12, 13] },
+  ];
+
   TRIP.days.forEach(day => {
+    // Insert section header before first day of each section
+    const section = sections.find(s => s.dayIds[0] === day.id);
+    if (section) {
+      const header = document.createElement('div');
+      header.className = 'itinerary-section-header';
+      header.innerHTML = `<span class="section-emoji">${section.emoji}</span><span class="section-title">${section.label}</span>`;
+      container.appendChild(header);
+    }
+
     const likedCount = day.activities.filter(a => a.liked).length;
     const hasRecs = day.city !== null;
     const preview = day.activities.length > 0 ? day.activities[0].name : (hasRecs ? 'Tap to discover things to do ✨' : 'No activities yet');
@@ -678,8 +693,21 @@ function saveNotes() {
 
 // ===== ACTIVITY ICON =====
 function typeIcon(type) {
-  const icons = { activity: '🎯', food: '🍽', transport: '✈️', hotel: '🏨', note: '📝' };
-  return icons[type] || '📌';
+  const icons = {
+    flight:   '✈️',
+    train:    '🚄',
+    car:      '🚗',
+    sleep:    '🔑',
+    food:     '🍴',
+    activity: '📍',
+    ceremony: '💍',
+    party:    '🎉',
+    note:     '💬',
+    // legacy fallbacks
+    transport: '✈️',
+    hotel:     '🔑',
+  };
+  return icons[type] || '📍';
 }
 
 // ===== TOAST =====
