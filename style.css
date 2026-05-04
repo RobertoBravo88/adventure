@@ -826,6 +826,63 @@ html, body {
 
 .rec-add-btn:hover { background: var(--accent-dark); }
 
+.rec-delete-btn {
+  background: none;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  font-size: 11px;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rec-delete-btn:hover {
+  background: rgba(155,29,53,0.2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.custom-badge {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-light);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 4px;
+  padding: 1px 5px;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* ===== ADD CUSTOM REC ===== */
+.add-rec-section {
+  padding: 20px 16px 120px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.add-rec-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.add-rec-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.add-rec-row .select-input { flex: 1; }
+
 /* ===== DAY REC STRIP ===== */
 .day-rec-section {
   padding: 16px 16px 8px;

@@ -210,6 +210,7 @@ let dayRecCategory = "all";
 
 let likedRecs = new Set();
 let addedRecs = {};
+let customRecs = [];
 
 // ===== FIREBASE =====
 firebase.initializeApp({
@@ -280,6 +281,24 @@ function initFirebase() {
     const el = document.getElementById('shared-notes');
     if (el && document.activeElement !== el) el.value = snap.val() || '';
   });
+  tripRef.child('customRecs').on('value', snap => {
+    customRecs = snap.val() ? Object.values(snap.val()) : [];
+    refreshCurrentScreen();
+  });
+}
+
+function findRec(recId) {
+  for (const city of ['rome', 'florence']) {
+    const rec = RECOMMENDATIONS[city]?.find(r => r.id === recId);
+    if (rec) return { rec, city };
+  }
+  const custom = customRecs.find(r => r.id === recId);
+  if (custom) return { rec: custom, city: custom.city };
+  return null;
+}
+
+function getAllRecs(city) {
+  return [...(RECOMMENDATIONS[city] || []), ...customRecs.filter(r => r.city === city)];
 }
 
 // ===== SCREEN NAVIGATION =====
@@ -512,9 +531,9 @@ function renderDayRecStrip(day) {
 function addRecToCurrentDay(recId, btn) {
   if (!currentDayId) return;
   const day = TRIP.days.find(d => d.id === currentDayId);
-  const city = day?.city;
-  const rec = city ? RECOMMENDATIONS[city]?.find(r => r.id === recId) : null;
-  if (!rec || !day) return;
+  const found = findRec(recId);
+  if (!found || !day) return;
+  const { rec } = found;
 
   // Prevent duplicate
   if (day.activities.some(a => a.recId === recId)) {
@@ -563,8 +582,8 @@ function renderDiscoverScreen() {
 function renderDiscoverFilters() {
   const filtersEl = document.getElementById('discover-filters');
   filtersEl.innerHTML = '';
-  const categories = ['all', 'sights', 'food', 'experience'];
-  const labels = { all: 'All', sights: 'Sights', food: 'Food', experience: 'Experiences' };
+  const categories = ['all', 'sights', 'food', 'experience', 'liked', 'added'];
+  const labels = { all: 'All', sights: 'Sights', food: 'Food', experience: 'Experiences', liked: '♡ Saved', added: '✓ Added' };
 
   categories.forEach(cat => {
     const btn = document.createElement('button');
@@ -579,11 +598,28 @@ function renderDiscoverList() {
   const list = document.getElementById('discover-list');
   list.innerHTML = '';
 
-  const recs = RECOMMENDATIONS[discoverCity] || [];
-  const filtered = discoverCategory === 'all' ? recs : recs.filter(r => r.category === discoverCategory);
+  let recs;
+  if (discoverCategory === 'liked') {
+    const all = [...(RECOMMENDATIONS.rome || []), ...(RECOMMENDATIONS.florence || []), ...customRecs];
+    recs = all.filter(r => likedRecs.has(r.id));
+  } else if (discoverCategory === 'added') {
+    const all = [...(RECOMMENDATIONS.rome || []), ...(RECOMMENDATIONS.florence || []), ...customRecs];
+    recs = all.filter(r => (addedRecs[r.id] || []).length > 0);
+  } else {
+    const all = getAllRecs(discoverCity);
+    recs = discoverCategory === 'all' ? all : all.filter(r => r.category === discoverCategory);
+  }
 
-  filtered.forEach(rec => {
+  if (recs.length === 0) {
+    const msg = discoverCategory === 'liked' ? 'Nothing saved yet — tap ♡ on any place to save it' :
+                discoverCategory === 'added' ? 'Nothing added to days yet' : 'No places here yet';
+    list.innerHTML = `<div class="empty-state" style="padding:40px 20px"><div class="empty-state-text">${msg}</div></div>`;
+    return;
+  }
+
+  recs.forEach(rec => {
     const isLiked = likedRecs.has(rec.id);
+    const isCustom = rec.custom === true;
     const addedDays = (addedRecs[rec.id] || []).map(dayId => {
       const day = TRIP.days.find(d => d.id === dayId);
       return day ? `Day ${day.id}` : null;
@@ -596,17 +632,18 @@ function renderDiscoverList() {
       ${photoUrl ? `<img class="rec-photo" src="${photoUrl}" alt="${rec.name}" onerror="this.style.display='none'">` : ''}
       <div class="rec-card-inner">
         <div class="rec-body">
-          <div class="rec-name">${rec.name}</div>
-          <div class="rec-detail">${rec.detail}</div>
+          <div class="rec-name">${rec.name}${isCustom ? ' <span class="custom-badge">yours</span>' : ''}</div>
+          <div class="rec-detail">${rec.detail || ''}</div>
           <div class="rec-meta">
-            ${renderStars(rec.rating)}
-            <a href="${rec.mapsUrl}" target="_blank" class="maps-link">View on Maps ↗</a>
+            ${rec.rating ? renderStars(rec.rating) : ''}
+            ${rec.mapsUrl ? `<a href="${rec.mapsUrl}" target="_blank" class="maps-link">View on Maps ↗</a>` : ''}
           </div>
           ${addedDays.length ? `<div class="rec-added-to">Added to: ${addedDays.join(', ')}</div>` : ''}
         </div>
         <div class="rec-actions">
           <button class="rec-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleRecLike('${rec.id}', this)">♡</button>
           <button class="rec-add-btn" onclick="openAddToDay('${rec.id}')">+ Add</button>
+          ${isCustom ? `<button class="rec-delete-btn" onclick="deleteCustomRec('${rec.id}')">✕</button>` : ''}
         </div>
       </div>
     `;
@@ -644,9 +681,9 @@ let modalRecId = null;
 
 function openAddToDay(recId) {
   modalRecId = recId;
-  const city = discoverCity;
-  const rec = RECOMMENDATIONS[city]?.find(r => r.id === recId);
-  if (!rec) return;
+  const found = findRec(recId);
+  if (!found) return;
+  const { rec, city } = found;
 
   document.getElementById('modal-rec-name').textContent = rec.name;
 
@@ -704,6 +741,28 @@ function addRecFromModal(recId, dayId, rec) {
 function closeModal() {
   document.getElementById('modal-overlay').style.display = 'none';
   modalRecId = null;
+}
+
+// ===== ADD / DELETE CUSTOM REC =====
+function addCustomRec() {
+  const name = document.getElementById('new-rec-name').value.trim();
+  const detail = document.getElementById('new-rec-detail').value.trim();
+  const mapsUrl = document.getElementById('new-rec-maps').value.trim() || null;
+  const category = document.getElementById('new-rec-category').value;
+  if (!name) { showToast('Add a name first'); return; }
+  const id = `custom_${Date.now()}`;
+  tripRef.child(`customRecs/${id}`).set({ id, city: discoverCity, category, name, detail, mapsUrl, custom: true });
+  document.getElementById('new-rec-name').value = '';
+  document.getElementById('new-rec-detail').value = '';
+  document.getElementById('new-rec-maps').value = '';
+  showToast('Place added ✓');
+}
+
+function deleteCustomRec(id) {
+  tripRef.child(`customRecs/${id}`).remove();
+  if (addedRecs[id]) { delete addedRecs[id]; saveAddedRecs(); }
+  if (likedRecs.has(id)) { likedRecs.delete(id); saveLikedRecs(); }
+  showToast('Removed');
 }
 
 // ===== GOOGLE MAPS URL PARSER =====

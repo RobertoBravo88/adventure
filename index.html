@@ -116,13 +116,26 @@
     <!-- Category filters -->
     <div class="rec-filter-row padded" id="discover-filters"></div>
 
-    <!-- Liked banner -->
-    <div id="liked-banner" class="liked-banner" style="display:none">
-      <span>♡ <span id="liked-count">0</span> saved — add them to a day below</span>
-    </div>
-
     <!-- Recommendations list -->
     <div class="discover-list" id="discover-list"></div>
+
+    <!-- Add your own place -->
+    <div class="add-rec-section">
+      <p class="section-label">Add your own place</p>
+      <div class="add-rec-form">
+        <input type="text" id="new-rec-name" placeholder="Place name" class="text-input" />
+        <input type="text" id="new-rec-detail" placeholder="Why it's worth a visit" class="text-input" />
+        <input type="text" id="new-rec-maps" placeholder="Google Maps URL (optional)" class="text-input" />
+        <div class="add-rec-row">
+          <select id="new-rec-category" class="select-input">
+            <option value="sights">🏛 Sight</option>
+            <option value="food">🍽 Food & Drink</option>
+            <option value="experience">✨ Experience</option>
+          </select>
+          <button class="btn-primary small" onclick="addCustomRec()">Add place</button>
+        </div>
+      </div>
+    </div>
 
     <nav class="bottom-nav">
       <button class="nav-btn" onclick="showScreen('itinerary-screen')"><span class="nav-icon">🗓</span><span>Itinerary</span></button>
