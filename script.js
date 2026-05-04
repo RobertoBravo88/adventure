@@ -1,0 +1,709 @@
+// ===== TRIP DATA =====
+
+const TRIP = {
+  title: "Adventure",
+  destination: "Poland · Rome · Florence",
+  dates: "May 13 – 25, 2026",
+  message: "A wedding, two cities, and the open road — every moment with you is the best part of the trip ♡",
+
+  days: [
+    {
+      id: 1,
+      title: "Drive to Eibergen",
+      date: "Wed, May 13",
+      city: null,
+      activities: [
+        { id: 1, type: "transport", name: "Drive after work to Rekken", detail: "Heading to the Netherlands ♡", liked: false },
+        { id: 2, type: "hotel",    name: "Stay with Robert's brother", detail: "Eibergen — home base for the night", liked: false },
+      ]
+    },
+    {
+      id: 2,
+      title: "Road Trip to Wrocław",
+      date: "Thu, May 14",
+      city: null,
+      activities: [
+        { id: 3, type: "transport", name: "Drive Eibergen → Wrocław", detail: "With Robert's brother — long drive, good vibes", liked: false },
+        { id: 4, type: "hotel",    name: "Hotel in Wrocław", detail: "Details to be added", liked: false },
+      ]
+    },
+    {
+      id: 3,
+      title: "Arrive at the Wedding Venue",
+      date: "Fri, May 15",
+      city: null,
+      activities: [
+        { id: 5, type: "transport", name: "Drive Wrocław → Wedding Venue", detail: "Wrocławska 111, 55-114 Pierwoszów · 30 min north of Wrocław", liked: false },
+        { id: 6, type: "hotel",    name: "Check in at venue from 15:00", detail: "Collect keys at reception", liked: false },
+        { id: 7, type: "activity", name: "Explore the venue & countryside", detail: "Enjoy the calm before the celebration ♡", liked: false },
+      ]
+    },
+    {
+      id: 4,
+      title: "Joanna & Eric's Wedding 🎉",
+      date: "Sat, May 16",
+      city: null,
+      activities: [
+        { id: 8,  type: "activity", name: "15:50 — Take your seats", detail: "Ceremony behind the main building", liked: false },
+        { id: 9,  type: "activity", name: "16:00 — Wedding Ceremony 💍", detail: "Joanna & Eric exchange vows", liked: true },
+        { id: 10, type: "food",     name: "17:00 — Wedding Dinner", detail: "Recharge and enjoy a lovely meal together", liked: false },
+        { id: 11, type: "food",     name: "18:30 — Wedding Cake 🎂", detail: "Watch them cut the cake", liked: false },
+        { id: 12, type: "activity", name: "19:00 – 04:00 — Party! 🎶", detail: "Dance until your feet hurt", liked: true },
+        { id: 13, type: "note",     name: "Dress code: Tenue de Ville", detail: "Suit with tie · Cocktail dress or pant suit", liked: false },
+      ]
+    },
+    {
+      id: 5,
+      title: "Recovery Day",
+      date: "Sun, May 17",
+      city: null,
+      activities: [
+        { id: 14, type: "food",  name: "09:00 – 11:00 — Wedding Breakfast", detail: "Stories and laughter from the night before ♡", liked: false },
+        { id: 15, type: "note",  name: "Check out by 11:30", detail: "Pack the night before if possible", liked: false },
+        { id: 16, type: "activity", name: "Relax, recover, reminisce ♡", detail: "Take it slow today — you earned it", liked: true },
+      ]
+    },
+    {
+      id: 6,
+      title: "Fly to Rome ✈️",
+      date: "Mon, May 18",
+      city: null,
+      activities: [
+        { id: 17, type: "transport", name: "FR2113 · Wrocław → Rome Ciampino", detail: "Departs 11:15 · Arrives 13:15 · Booking: J6K6FX", liked: false },
+        { id: 18, type: "hotel",    name: "Check in — The Social Hub Rome", detail: "Viale dello Scalo San Lorenzo, 10, 00185 · From 15:00", liked: false },
+      ]
+    },
+    {
+      id: 7,
+      title: "Rome — Day 1",
+      date: "Tue, May 19",
+      city: "rome",
+      activities: []
+    },
+    {
+      id: 8,
+      title: "Rome — Day 2",
+      date: "Wed, May 20",
+      city: "rome",
+      activities: []
+    },
+    {
+      id: 9,
+      title: "Rome → Florence 🚂",
+      date: "Thu, May 21",
+      city: "rome",
+      activities: [
+        { id: 19, type: "transport", name: "Check out The Social Hub", detail: "Check-out by 12:00 — store luggage at reception if needed", liked: false },
+        { id: 20, type: "transport", name: "Train Roma Termini → Firenze SMN", detail: "Frecciarossa · ~1h 40min · Book at Trenitalia.com", liked: false },
+        { id: 21, type: "hotel",    name: "Check in — Hotel Palazzo Borghini", detail: "Via Vincenzo Borghini, 23, 50133 Florence · From 15:00", liked: false },
+      ]
+    },
+    {
+      id: 10,
+      title: "Florence — Day 1",
+      date: "Fri, May 22",
+      city: "florence",
+      activities: []
+    },
+    {
+      id: 11,
+      title: "Florence — Day 2",
+      date: "Sat, May 23",
+      city: "florence",
+      activities: []
+    },
+    {
+      id: 12,
+      title: "Florence — Day 3",
+      date: "Sun, May 24",
+      city: "florence",
+      activities: []
+    },
+    {
+      id: 13,
+      title: "Florence → Bologna → Home ✈️",
+      date: "Mon, May 25",
+      city: null,
+      activities: [
+        { id: 22, type: "note",     name: "Check out Hotel Palazzo Borghini", detail: "Check-out 07:00 – 11:00 — early start today", liked: false },
+        { id: 23, type: "transport", name: "Train Florence → Bologna Centrale", detail: "Frecciarossa · ~35 min · Book at Trenitalia.com", liked: false },
+        { id: 24, type: "transport", name: "FR4863 · Bologna → Brussels Charleroi", detail: "Departs 16:35 · Arrives 18:20 · Booking: T8L9GE", liked: false },
+        { id: 25, type: "note",     name: "Home sweet home ♡", detail: "What an adventure — already looking forward to the next one", liked: true },
+      ]
+    },
+  ]
+};
+
+// ===== TRANSPORT =====
+const TRANSPORT = [
+  {
+    type: "Flight", icon: "✈️",
+    from: "Wrocław", to: "Rome Ciampino",
+    details: ["Date: Monday May 18", "Flight: FR2113 (Ryanair)", "Departs: 11:15 WRO · Arrives: 13:15 CIA", "Booking: J6K6FX"],
+    trackUrl: "https://www.flightradar24.com/data/flights/fr2113"
+  },
+  {
+    type: "Train", icon: "🚄",
+    from: "Rome Termini", to: "Florence SMN",
+    details: ["Date: Thursday May 21", "Frecciarossa high-speed", "Journey: ~1h 40min", "Not yet booked — Trenitalia.com"],
+    trackUrl: "https://www.trenitalia.com/en.html"
+  },
+  {
+    type: "Train", icon: "🚄",
+    from: "Florence SMN", to: "Bologna Centrale",
+    details: ["Date: Monday May 25", "Frecciarossa high-speed", "Journey: ~35 min", "Not yet booked — Trenitalia.com"],
+    trackUrl: "https://www.trenitalia.com/en.html"
+  },
+  {
+    type: "Flight", icon: "✈️",
+    from: "Bologna", to: "Brussels Charleroi",
+    details: ["Date: Monday May 25", "Flight: FR4863 (Ryanair)", "Departs: 16:35 BLQ · Arrives: 18:20 CRL", "Booking: T8L9GE"],
+    trackUrl: "https://www.flightradar24.com/data/flights/fr4863"
+  },
+];
+
+// ===== RECOMMENDATIONS =====
+const RECOMMENDATIONS = {
+  rome: [
+    { id: "r1",  category: "sights",     icon: "🏛", name: "Colosseum & Roman Forum",       detail: "The heart of ancient Rome — book online to skip queues" },
+    { id: "r2",  category: "sights",     icon: "⛩", name: "Pantheon",                       detail: "2,000 years old and perfectly preserved — visit at opening" },
+    { id: "r3",  category: "sights",     icon: "🎨", name: "Vatican Museums & Sistine Chapel", detail: "Book early — the most visited museum in the world" },
+    { id: "r4",  category: "sights",     icon: "⛪", name: "St. Peter's Basilica",           detail: "Free entry — climb the dome for panoramic views of Rome" },
+    { id: "r5",  category: "sights",     icon: "⛲", name: "Trevi Fountain at dawn",         detail: "Visit early to avoid the crowds — throw a coin ♡" },
+    { id: "r6",  category: "sights",     icon: "🖼", name: "Borghese Gallery",               detail: "Bernini sculptures up close — must book weeks ahead" },
+    { id: "r7",  category: "sights",     icon: "🏰", name: "Castel Sant'Angelo",             detail: "Former papal fortress with great views from the top" },
+    { id: "r8",  category: "food",       icon: "🍝", name: "Cacio e pepe at Da Enzo al 29",  detail: "Classic Roman pasta in the heart of Trastevere" },
+    { id: "r9",  category: "food",       icon: "🍡", name: "Supplì Roma",                    detail: "The best Roman street snack — fried rice balls" },
+    { id: "r10", category: "food",       icon: "🍦", name: "Gelato at Fatamorgana",          detail: "Creative artisan gelato — try the unusual flavours" },
+    { id: "r11", category: "food",       icon: "🍷", name: "Aperitivo at Campo de' Fiori",   detail: "Lively piazza perfect for evening drinks" },
+    { id: "r12", category: "food",       icon: "🍽", name: "Dinner in Trastevere",           detail: "Most romantic neighbourhood in Rome — perfect for a date night ♡" },
+    { id: "r13", category: "experience", icon: "🌅", name: "Sunset on Janiculum Hill",       detail: "Best panoramic view of Rome — magical at golden hour" },
+    { id: "r14", category: "experience", icon: "☕", name: "Morning espresso ritual",        detail: "Stand at the bar, order an espresso, live like a Roman" },
+    { id: "r15", category: "experience", icon: "🕍", name: "Explore the Jewish Ghetto",      detail: "Ancient, atmospheric neighbourhood with incredible food" },
+    { id: "r16", category: "experience", icon: "🚶", name: "Evening stroll along the Tiber", detail: "Walk from Trastevere to Castel Sant'Angelo at dusk" },
+  ],
+  florence: [
+    { id: "f1",  category: "sights",     icon: "🎨", name: "Uffizi Gallery",                 detail: "Botticelli's Birth of Venus — book well in advance" },
+    { id: "f2",  category: "sights",     icon: "⛪", name: "Florence Cathedral & Dome Climb", detail: "Brunelleschi's dome — book the climb for breathtaking views" },
+    { id: "f3",  category: "sights",     icon: "🗿", name: "Accademia — Michelangelo's David", detail: "The real thing is absolutely breathtaking — book ahead" },
+    { id: "f4",  category: "sights",     icon: "🌿", name: "Boboli Gardens",                 detail: "Beautiful Renaissance gardens behind Palazzo Pitti" },
+    { id: "f5",  category: "sights",     icon: "🏛", name: "Palazzo Vecchio",                detail: "The old town hall — great views from the tower" },
+    { id: "f6",  category: "food",       icon: "🥩", name: "Bistecca Fiorentina dinner",     detail: "The iconic Florentine T-bone — go big or go home" },
+    { id: "f7",  category: "food",       icon: "🥗", name: "Mercato Centrale lunch",         detail: "The best food market in Florence — incredible variety" },
+    { id: "f8",  category: "food",       icon: "🍦", name: "Gelato at Gelateria dei Neri",   detail: "Local favourite on Via dei Neri — try the ricotta and fig" },
+    { id: "f9",  category: "food",       icon: "🍷", name: "Aperitivo in Oltrarno",          detail: "The artisan quarter across the river — cool local bars" },
+    { id: "f10", category: "food",       icon: "🥪", name: "Lampredotto sandwich",           detail: "Classic Florentine street food — adventurous and delicious" },
+    { id: "f11", category: "experience", icon: "🌅", name: "Sunset at Piazzale Michelangelo", detail: "The most beautiful view of Florence — go early for a spot ♡" },
+    { id: "f12", category: "experience", icon: "🌉", name: "Ponte Vecchio at dawn",          detail: "The famous bridge without the crowds — truly magical" },
+    { id: "f13", category: "experience", icon: "🏔", name: "Day trip to Fiesole",            detail: "Hilltop village 20 min by bus — stunning valley views" },
+    { id: "f14", category: "experience", icon: "🛍", name: "Artisan workshops in Oltrarno",  detail: "Leatherwork, gold jewellery, bookbinding — unique to Florence" },
+    { id: "f15", category: "experience", icon: "🚶", name: "Walk across Ponte Santa Trinita", detail: "Less touristy than Ponte Vecchio — beautiful views along the Arno" },
+  ]
+};
+
+// ===== STATE =====
+let currentDayId = null;
+let nextActivityId = 200;
+let discoverCity = "rome";
+let discoverCategory = "all";
+let dayRecCategory = "all";
+
+// Liked recommendations — persisted to localStorage
+let likedRecs = new Set(JSON.parse(localStorage.getItem('adventure_liked_recs') || '[]'));
+// Map of recId → array of dayIds it's been added to
+let addedRecs = JSON.parse(localStorage.getItem('adventure_added_recs') || '{}');
+
+function saveLikedRecs() {
+  localStorage.setItem('adventure_liked_recs', JSON.stringify([...likedRecs]));
+}
+
+function saveAddedRecs() {
+  localStorage.setItem('adventure_added_recs', JSON.stringify(addedRecs));
+}
+
+// ===== SCREEN NAVIGATION =====
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+
+  if (screenId === 'discover-screen') renderDiscoverScreen();
+  if (screenId === 'itinerary-screen') renderItinerary();
+
+  // Sync nav active state
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  const map = {
+    'itinerary-screen': 'Itinerary',
+    'day-detail-screen': 'Itinerary',
+    'discover-screen': 'Discover',
+    'transport-screen': 'Transport',
+    'notes-screen': 'Notes',
+  };
+  const label = map[screenId];
+  if (label) {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      if (btn.textContent.trim().startsWith(label)) btn.classList.add('active');
+    });
+  }
+}
+
+// ===== OPEN DAY =====
+function openDay(dayId) {
+  currentDayId = dayId;
+  dayRecCategory = 'all';
+  const day = TRIP.days.find(d => d.id === dayId);
+  if (!day) return;
+  document.getElementById('day-detail-title').textContent = `Day ${day.id}`;
+  renderDayDetail(day);
+  showScreen('day-detail-screen');
+}
+
+// ===== RENDER ITINERARY =====
+function renderItinerary() {
+  document.getElementById('welcome-destination').textContent = TRIP.destination;
+  document.getElementById('welcome-dates').textContent = TRIP.dates;
+  document.getElementById('welcome-message').textContent = `"${TRIP.message}"`;
+  document.getElementById('summary-destination').textContent = TRIP.destination;
+  document.getElementById('summary-days').textContent = TRIP.days.length;
+
+  const container = document.getElementById('days-container');
+  container.innerHTML = '';
+
+  TRIP.days.forEach(day => {
+    const likedCount = day.activities.filter(a => a.liked).length;
+    const hasRecs = day.city !== null;
+    const preview = day.activities.length > 0 ? day.activities[0].name : (hasRecs ? 'Tap to discover things to do ✨' : 'No activities yet');
+
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.onclick = () => openDay(day.id);
+    card.innerHTML = `
+      <div class="day-card-top">
+        <span class="day-number">Day ${day.id}</span>
+        <span class="day-date">${day.date}</span>
+      </div>
+      <div class="day-title">${day.title}</div>
+      <div class="day-preview">
+        <span>${preview}</span>
+        <span class="activity-count">${day.activities.length} items${likedCount ? ` · ${likedCount} ♡` : ''}${hasRecs ? ' · ✨' : ''}</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ===== RENDER DAY DETAIL =====
+function renderDayDetail(day) {
+  const content = document.getElementById('day-detail-content');
+  content.innerHTML = '';
+
+  // Hero
+  const hero = document.createElement('div');
+  hero.className = 'day-hero';
+  hero.innerHTML = `
+    <div class="day-hero-label">Day ${day.id} of ${TRIP.days.length}</div>
+    <div class="day-hero-title">${day.title}</div>
+    <div class="day-hero-date">${day.date}</div>
+  `;
+  content.appendChild(hero);
+
+  // Activities
+  if (day.activities.length > 0) {
+    const label = document.createElement('p');
+    label.className = 'section-label';
+    label.textContent = 'Plan';
+    label.style.padding = '0 16px';
+    content.appendChild(label);
+
+    const list = document.createElement('div');
+    list.className = 'activities-list';
+    list.style.padding = '0 16px';
+
+    day.activities.forEach(activity => {
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.innerHTML = `
+        <span class="activity-icon">${typeIcon(activity.type)}</span>
+        <div class="activity-body">
+          <div class="activity-name">${activity.name}</div>
+          ${activity.detail ? `<div class="activity-detail">${activity.detail}</div>` : ''}
+        </div>
+        <div class="activity-actions">
+          <button class="like-btn ${activity.liked ? 'liked' : ''}" onclick="toggleLike(${day.id}, ${activity.id})">♡</button>
+          <button class="delete-btn" onclick="deleteActivity(${day.id}, ${activity.id})">✕</button>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+    content.appendChild(list);
+  } else if (!day.city) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.style.padding = '32px 16px';
+    empty.innerHTML = `<div class="empty-state-icon">✨</div><div class="empty-state-text">Nothing planned yet — add something below!</div>`;
+    content.appendChild(empty);
+  }
+
+  // Recommendations strip (city days only)
+  const recSection = document.getElementById('day-rec-section');
+  if (day.city) {
+    recSection.style.display = 'block';
+    document.getElementById('day-rec-label').textContent =
+      `Discover ${day.city === 'rome' ? 'Rome' : 'Florence'}`;
+    renderDayRecFilters(day);
+    renderDayRecStrip(day);
+  } else {
+    recSection.style.display = 'none';
+  }
+}
+
+// ===== DAY REC FILTERS =====
+function renderDayRecFilters(day) {
+  const filtersEl = document.getElementById('day-rec-filters');
+  filtersEl.innerHTML = '';
+  const categories = ['all', 'sights', 'food', 'experience'];
+  const labels = { all: 'All', sights: 'Sights', food: 'Food', experience: 'Experiences' };
+
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = `filter-btn ${dayRecCategory === cat ? 'active' : ''}`;
+    btn.textContent = labels[cat];
+    btn.onclick = () => { dayRecCategory = cat; renderDayRecFilters(day); renderDayRecStrip(day); };
+    filtersEl.appendChild(btn);
+  });
+}
+
+// ===== DAY REC STRIP =====
+function renderDayRecStrip(day) {
+  const strip = document.getElementById('day-rec-strip');
+  strip.innerHTML = '';
+
+  const recs = RECOMMENDATIONS[day.city] || [];
+  const filtered = dayRecCategory === 'all' ? recs : recs.filter(r => r.category === dayRecCategory);
+
+  if (filtered.length === 0) {
+    strip.innerHTML = `<p style="font-size:13px;color:var(--mid-gray);padding:8px 0">Nothing in this category yet.</p>`;
+    return;
+  }
+
+  filtered.forEach(rec => {
+    const isAdded = (addedRecs[rec.id] || []).includes(day.id);
+    const isLiked = likedRecs.has(rec.id);
+
+    const card = document.createElement('div');
+    card.className = 'rec-strip-card';
+    card.innerHTML = `
+      <span class="rec-strip-icon">${rec.icon}</span>
+      <div class="rec-strip-name">${rec.name}</div>
+      <div class="rec-strip-detail">${rec.detail}</div>
+      <div class="rec-strip-actions">
+        <button class="rec-strip-like ${isLiked ? 'liked' : ''}" onclick="toggleRecLike('${rec.id}', this)">♡</button>
+        <button class="rec-strip-add ${isAdded ? 'added' : ''}" onclick="addRecToCurrentDay('${rec.id}', this)">
+          ${isAdded ? '✓ Added' : '+ Add'}
+        </button>
+      </div>
+    `;
+    strip.appendChild(card);
+  });
+}
+
+// ===== ADD REC TO CURRENT DAY =====
+function addRecToCurrentDay(recId, btn) {
+  if (!currentDayId) return;
+  const day = TRIP.days.find(d => d.id === currentDayId);
+  const city = day?.city;
+  const rec = city ? RECOMMENDATIONS[city]?.find(r => r.id === recId) : null;
+  if (!rec || !day) return;
+
+  // Prevent duplicate
+  if (day.activities.some(a => a.recId === recId)) {
+    showToast('Already on this day!');
+    return;
+  }
+
+  day.activities.push({
+    id: nextActivityId++,
+    recId,
+    type: rec.category === 'food' ? 'food' : 'activity',
+    name: rec.name,
+    detail: rec.detail,
+    liked: false
+  });
+
+  // Track in addedRecs
+  if (!addedRecs[recId]) addedRecs[recId] = [];
+  if (!addedRecs[recId].includes(currentDayId)) addedRecs[recId].push(currentDayId);
+  saveAddedRecs();
+
+  // Update button
+  btn.textContent = '✓ Added';
+  btn.classList.add('added');
+
+  renderDayDetail(day);
+  showToast(`Added to Day ${day.id} ✓`);
+}
+
+// ===== DISCOVER SCREEN =====
+function setDiscoverCity(city, el) {
+  discoverCity = city;
+  discoverCategory = 'all';
+  document.querySelectorAll('.city-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderDiscoverScreen();
+}
+
+function renderDiscoverScreen() {
+  renderDiscoverFilters();
+  renderDiscoverList();
+  updateLikedBanner();
+}
+
+function renderDiscoverFilters() {
+  const filtersEl = document.getElementById('discover-filters');
+  filtersEl.innerHTML = '';
+  const categories = ['all', 'sights', 'food', 'experience'];
+  const labels = { all: 'All', sights: 'Sights', food: 'Food', experience: 'Experiences' };
+
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = `filter-btn ${discoverCategory === cat ? 'active' : ''}`;
+    btn.textContent = labels[cat];
+    btn.onclick = () => { discoverCategory = cat; renderDiscoverFilters(); renderDiscoverList(); };
+    filtersEl.appendChild(btn);
+  });
+}
+
+function renderDiscoverList() {
+  const list = document.getElementById('discover-list');
+  list.innerHTML = '';
+
+  const recs = RECOMMENDATIONS[discoverCity] || [];
+  const filtered = discoverCategory === 'all' ? recs : recs.filter(r => r.category === discoverCategory);
+
+  filtered.forEach(rec => {
+    const isLiked = likedRecs.has(rec.id);
+    const addedDays = (addedRecs[rec.id] || []).map(dayId => {
+      const day = TRIP.days.find(d => d.id === dayId);
+      return day ? `Day ${day.id}` : null;
+    }).filter(Boolean);
+
+    const card = document.createElement('div');
+    card.className = 'rec-card';
+    card.innerHTML = `
+      <span class="rec-icon">${rec.icon}</span>
+      <div class="rec-body">
+        <div class="rec-name">${rec.name}</div>
+        <div class="rec-detail">${rec.detail}</div>
+        <span class="rec-category-tag">${rec.category}</span>
+        ${addedDays.length ? `<div style="font-size:11px;color:var(--mid-gray);margin-top:4px">Added to: ${addedDays.join(', ')}</div>` : ''}
+      </div>
+      <div class="rec-actions">
+        <button class="rec-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleRecLike('${rec.id}', this)">♡</button>
+        <button class="rec-add-btn" onclick="openAddToDay('${rec.id}')">+ Add</button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function updateLikedBanner() {
+  const banner = document.getElementById('liked-banner');
+  const count = document.getElementById('liked-count');
+  if (likedRecs.size > 0) {
+    banner.style.display = 'block';
+    count.textContent = likedRecs.size;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ===== TOGGLE REC LIKE =====
+function toggleRecLike(recId, btn) {
+  if (likedRecs.has(recId)) {
+    likedRecs.delete(recId);
+    btn.classList.remove('liked');
+  } else {
+    likedRecs.add(recId);
+    btn.classList.add('liked');
+    showToast('Saved ♡');
+  }
+  saveLikedRecs();
+  updateLikedBanner();
+}
+
+// ===== ADD TO DAY MODAL (from Discover screen) =====
+let modalRecId = null;
+
+function openAddToDay(recId) {
+  modalRecId = recId;
+  const city = discoverCity;
+  const rec = RECOMMENDATIONS[city]?.find(r => r.id === recId);
+  if (!rec) return;
+
+  document.getElementById('modal-rec-name').textContent = rec.name;
+
+  // Show only days that match the city (or days with no city for context)
+  const relevantDays = TRIP.days.filter(d => d.city === city || d.city === null);
+  const modalDays = document.getElementById('modal-days');
+  modalDays.innerHTML = '';
+
+  relevantDays.forEach(day => {
+    const isAdded = (addedRecs[recId] || []).includes(day.id);
+    const btn = document.createElement('button');
+    btn.className = 'modal-day-btn';
+    btn.disabled = isAdded;
+    btn.style.opacity = isAdded ? '0.5' : '1';
+    btn.innerHTML = `
+      <span>${day.title} ${isAdded ? '✓' : ''}</span>
+      <span class="modal-day-date">${day.date}</span>
+    `;
+    if (!isAdded) {
+      btn.onclick = () => addRecFromModal(recId, day.id, rec);
+    }
+    modalDays.appendChild(btn);
+  });
+
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function addRecFromModal(recId, dayId, rec) {
+  const day = TRIP.days.find(d => d.id === dayId);
+  if (!day) return;
+
+  if (day.activities.some(a => a.recId === recId)) {
+    showToast('Already on this day!');
+    return;
+  }
+
+  day.activities.push({
+    id: nextActivityId++,
+    recId,
+    type: rec.category === 'food' ? 'food' : 'activity',
+    name: rec.name,
+    detail: rec.detail,
+    liked: false
+  });
+
+  if (!addedRecs[recId]) addedRecs[recId] = [];
+  addedRecs[recId].push(dayId);
+  saveAddedRecs();
+
+  closeModal();
+  renderDiscoverList();
+  showToast(`Added to Day ${day.id} ✓`);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+  modalRecId = null;
+}
+
+// ===== ADD CUSTOM ACTIVITY =====
+function addActivity() {
+  const input = document.getElementById('new-activity-input');
+  const typeSelect = document.getElementById('new-activity-type');
+  const name = input.value.trim();
+  if (!name) { showToast('Please type something first'); return; }
+
+  const day = TRIP.days.find(d => d.id === currentDayId);
+  if (!day) return;
+
+  day.activities.push({ id: nextActivityId++, type: typeSelect.value, name, detail: '', liked: false });
+  input.value = '';
+  renderDayDetail(day);
+  renderItinerary();
+  showToast('Added ✓');
+}
+
+// ===== TOGGLE LIKE (itinerary item) =====
+function toggleLike(dayId, activityId) {
+  const day = TRIP.days.find(d => d.id === dayId);
+  const activity = day?.activities.find(a => a.id === activityId);
+  if (!activity) return;
+  activity.liked = !activity.liked;
+  renderDayDetail(day);
+  if (activity.liked) showToast('Loved it ♡');
+}
+
+// ===== DELETE ACTIVITY =====
+function deleteActivity(dayId, activityId) {
+  const day = TRIP.days.find(d => d.id === dayId);
+  if (!day) return;
+  const act = day.activities.find(a => a.id === activityId);
+  // Clean up addedRecs tracking if it came from a recommendation
+  if (act?.recId) {
+    if (addedRecs[act.recId]) {
+      addedRecs[act.recId] = addedRecs[act.recId].filter(id => id !== dayId);
+      saveAddedRecs();
+    }
+  }
+  day.activities = day.activities.filter(a => a.id !== activityId);
+  renderDayDetail(day);
+  renderItinerary();
+  showToast('Removed');
+}
+
+// ===== TRANSPORT =====
+function renderTransport() {
+  const container = document.getElementById('transport-content');
+  container.innerHTML = '';
+
+  TRANSPORT.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'transport-card';
+    card.innerHTML = `
+      <div class="transport-type">${t.icon} ${t.type}</div>
+      <div class="transport-route">
+        <span class="transport-city">${t.from}</span>
+        <span class="transport-arrow">——→</span>
+        <span class="transport-city">${t.to}</span>
+      </div>
+      <div class="transport-meta">${t.details.map(d => `<span>· ${d}</span>`).join('')}</div>
+      <a href="${t.trackUrl}" target="_blank" class="live-status-btn">🔴 Check live status</a>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ===== NOTES =====
+function renderNotes() {
+  document.getElementById('personal-message-display').textContent = TRIP.message;
+  const saved = localStorage.getItem('adventure_notes');
+  if (saved) document.getElementById('shared-notes').value = saved;
+}
+
+function saveNotes() {
+  localStorage.setItem('adventure_notes', document.getElementById('shared-notes').value);
+  showToast('Notes saved ✓');
+}
+
+// ===== ACTIVITY ICON =====
+function typeIcon(type) {
+  const icons = { activity: '🎯', food: '🍽', transport: '✈️', hotel: '🏨', note: '📝' };
+  return icons[type] || '📌';
+}
+
+// ===== TOAST =====
+let toastTimeout;
+function showToast(message) {
+  let toast = document.querySelector('.toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  renderItinerary();
+  renderTransport();
+  renderNotes();
+
+  document.getElementById('new-activity-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') addActivity();
+  });
+});

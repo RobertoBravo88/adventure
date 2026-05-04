@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adventure ✈️</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===== WELCOME SCREEN ===== -->
+  <div id="welcome-screen" class="screen active">
+    <div class="welcome-content">
+      <p class="welcome-eyebrow">A trip for two ♡</p>
+      <h1 class="welcome-title">Adventure</h1>
+      <p class="welcome-subtitle" id="welcome-destination"></p>
+      <p class="welcome-dates" id="welcome-dates"></p>
+      <p class="welcome-message" id="welcome-message"></p>
+      <button class="btn-primary" onclick="showScreen('itinerary-screen')">Open our trip ♡</button>
+    </div>
+    <div class="welcome-bg-dots"></div>
+  </div>
+
+  <!-- ===== ITINERARY SCREEN ===== -->
+  <div id="itinerary-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="showScreen('welcome-screen')">←</button>
+      <h2 class="header-title">Our Itinerary</h2>
+      <div style="width:40px"></div>
+    </header>
+    <div class="trip-summary">
+      <div class="summary-item">
+        <span class="summary-label">Destination</span>
+        <span class="summary-value" id="summary-destination"></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Days</span>
+        <span class="summary-value" id="summary-days"></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Travelers</span>
+        <span class="summary-value">2 ♡</span>
+      </div>
+    </div>
+    <div class="days-container" id="days-container"></div>
+    <nav class="bottom-nav">
+      <button class="nav-btn active" onclick="showScreen('itinerary-screen')"><span class="nav-icon">🗓</span><span>Itinerary</span></button>
+      <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✨</span><span>Discover</span></button>
+      <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈️</span><span>Transport</span></button>
+      <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">♡</span><span>Notes</span></button>
+    </nav>
+  </div>
+
+  <!-- ===== DAY DETAIL SCREEN ===== -->
+  <div id="day-detail-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="showScreen('itinerary-screen')">←</button>
+      <h2 class="header-title" id="day-detail-title">Day 1</h2>
+      <div style="width:40px"></div>
+    </header>
+
+    <div class="day-detail-scroll">
+      <div class="day-detail-content" id="day-detail-content"></div>
+
+      <!-- Recommendations strip (shown for city days only) -->
+      <div id="day-rec-section" class="day-rec-section" style="display:none">
+        <div class="day-rec-header">
+          <p class="section-label" id="day-rec-label">Discover</p>
+          <button class="see-all-btn" onclick="showScreen('discover-screen')">See all →</button>
+        </div>
+        <div class="rec-filter-row" id="day-rec-filters"></div>
+        <div class="rec-strip" id="day-rec-strip"></div>
+      </div>
+
+      <!-- Add custom activity -->
+      <div class="add-activity-section">
+        <h3 class="section-label">Add your own</h3>
+        <div class="add-activity-form">
+          <input type="text" id="new-activity-input" placeholder="e.g. Dinner somewhere special" class="text-input" />
+          <select id="new-activity-type" class="select-input">
+            <option value="activity">🎯 Activity</option>
+            <option value="food">🍽 Food & Drink</option>
+            <option value="transport">✈️ Transport</option>
+            <option value="hotel">🏨 Hotel</option>
+            <option value="note">📝 Note</option>
+          </select>
+          <button class="btn-primary small" onclick="addActivity()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn" onclick="showScreen('itinerary-screen')"><span class="nav-icon">🗓</span><span>Itinerary</span></button>
+      <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✨</span><span>Discover</span></button>
+      <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈️</span><span>Transport</span></button>
+      <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">♡</span><span>Notes</span></button>
+    </nav>
+  </div>
+
+  <!-- ===== DISCOVER SCREEN ===== -->
+  <div id="discover-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="showScreen('itinerary-screen')">←</button>
+      <h2 class="header-title">Discover</h2>
+      <div style="width:40px"></div>
+    </header>
+
+    <!-- City tabs -->
+    <div class="city-tabs">
+      <button class="city-tab active" onclick="setDiscoverCity('rome', this)">Rome</button>
+      <button class="city-tab" onclick="setDiscoverCity('florence', this)">Florence</button>
+    </div>
+
+    <!-- Category filters -->
+    <div class="rec-filter-row padded" id="discover-filters"></div>
+
+    <!-- Liked banner -->
+    <div id="liked-banner" class="liked-banner" style="display:none">
+      <span>♡ <span id="liked-count">0</span> saved — add them to a day below</span>
+    </div>
+
+    <!-- Recommendations list -->
+    <div class="discover-list" id="discover-list"></div>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn" onclick="showScreen('itinerary-screen')"><span class="nav-icon">🗓</span><span>Itinerary</span></button>
+      <button class="nav-btn active" onclick="showScreen('discover-screen')"><span class="nav-icon">✨</span><span>Discover</span></button>
+      <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈️</span><span>Transport</span></button>
+      <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">♡</span><span>Notes</span></button>
+    </nav>
+  </div>
+
+  <!-- ===== TRANSPORT SCREEN ===== -->
+  <div id="transport-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="showScreen('itinerary-screen')">←</button>
+      <h2 class="header-title">Flights & Trains</h2>
+      <div style="width:40px"></div>
+    </header>
+    <div class="transport-content" id="transport-content"></div>
+    <nav class="bottom-nav">
+      <button class="nav-btn" onclick="showScreen('itinerary-screen')"><span class="nav-icon">🗓</span><span>Itinerary</span></button>
+      <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✨</span><span>Discover</span></button>
+      <button class="nav-btn active" onclick="showScreen('transport-screen')"><span class="nav-icon">✈️</span><span>Transport</span></button>
+      <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">♡</span><span>Notes</span></button>
+    </nav>
+  </div>
+
+  <!-- ===== NOTES SCREEN ===== -->
+  <div id="notes-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="showScreen('itinerary-screen')">←</button>
+      <h2 class="header-title">Our Notes</h2>
+      <div style="width:40px"></div>
+    </header>
+    <div class="notes-content">
+      <div class="note-card special">
+        <p class="note-label">Message for you ♡</p>
+        <p class="note-text" id="personal-message-display">Loading...</p>
+      </div>
+      <div class="note-card">
+        <p class="note-label">Shared notes</p>
+        <textarea id="shared-notes" class="notes-textarea" placeholder="Packing list, reminders, wishes..."></textarea>
+        <button class="btn-secondary" onclick="saveNotes()">Save notes</button>
+      </div>
+    </div>
+    <nav class="bottom-nav">
+      <button class="nav-btn" onclick="showScreen('itinerary-screen')"><span class="nav-icon">🗓</span><span>Itinerary</span></button>
+      <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✨</span><span>Discover</span></button>
+      <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈️</span><span>Transport</span></button>
+      <button class="nav-btn active" onclick="showScreen('notes-screen')"><span class="nav-icon">♡</span><span>Notes</span></button>
+    </nav>
+  </div>
+
+  <!-- ===== ADD TO DAY MODAL ===== -->
+  <div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <p class="modal-title" id="modal-rec-name"></p>
+      <p class="modal-label">Add to which day?</p>
+      <div class="modal-days" id="modal-days"></div>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
