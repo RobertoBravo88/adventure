@@ -16,14 +16,14 @@
   --gold:         #C9A84C;
   --gold-light:   rgba(201,168,76,0.12);
   --ink:          #F2E8D5;
-  --ink-2:        #A8937C;
-  --ink-3:        #5E4A3A;
+  --ink-2:        #C4AA8E;
+  --ink-3:        #9A8272;
   --border:       #3A1C28;
   --border-2:     #4E2836;
   --font:         'Space Grotesk', 'Inter', system-ui, sans-serif;
   --font-body:    'Inter', system-ui, sans-serif;
-  --radius:       14px;
-  --radius-sm:    10px;
+  --radius:       4px;
+  --radius-sm:    2px;
   --shadow:       0 2px 8px rgba(0,0,0,0.5), 0 6px 20px rgba(0,0,0,0.35);
   --shadow-md:    0 8px 40px rgba(0,0,0,0.6);
 }
@@ -365,12 +365,28 @@ html, body {
   cursor: pointer;
   transition: transform 0.15s, border-color 0.15s;
   border: 1px solid var(--border);
+  position: relative;
 }
+
+.day-card::before,
+.day-card::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(201,168,76,0.3);
+  border-style: solid;
+  pointer-events: none;
+}
+.day-card::before { top: 5px; left: 5px; border-width: 1px 0 0 1px; }
+.day-card::after  { bottom: 5px; right: 5px; border-width: 0 1px 1px 0; }
 
 .day-card:hover {
   transform: translateY(-2px);
-  border-color: var(--accent);
+  border-color: var(--gold);
 }
+.day-card:hover::before,
+.day-card:hover::after { border-color: rgba(201,168,76,0.7); }
 
 .day-card-top {
   display: flex;
@@ -406,7 +422,7 @@ html, body {
 
 .day-preview {
   font-size: 12px;
-  color: var(--ink-3);
+  color: var(--ink-2);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -419,7 +435,7 @@ html, body {
   padding: 2px 7px;
   font-size: 9px;
   font-weight: 700;
-  color: var(--ink-3);
+  color: var(--ink-2);
   font-family: var(--font);
   flex-shrink: 0;
   letter-spacing: 0.06em;
@@ -472,7 +488,7 @@ html, body {
 
 .day-hero-date {
   font-size: 11px;
-  color: var(--ink-3);
+  color: var(--ink-2);
   margin-top: 6px;
   font-family: var(--font);
   font-weight: 500;
@@ -491,11 +507,23 @@ html, body {
   font-family: var(--font);
   font-size: 8px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--gold);
   margin-bottom: 10px;
   margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.5;
+  flex-shrink: 0;
 }
 
 .activity-item {
@@ -509,16 +537,19 @@ html, body {
 }
 
 .activity-icon {
-  font-size: 15px;
+  font-size: 13px;
   flex-shrink: 0;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-2);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 0;
+  border: 1px solid rgba(201,168,76,0.45);
+  color: var(--gold);
+  font-family: var(--font);
+  flex-shrink: 0;
 }
 
 .activity-body { flex: 1; min-width: 0; }
@@ -531,7 +562,7 @@ html, body {
   margin-bottom: 2px;
 }
 
-.activity-detail { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+.activity-detail { font-size: 12px; color: var(--ink-2); line-height: 1.5; }
 .activity-actions { display: flex; gap: 6px; align-items: center; }
 
 .like-btn {
@@ -725,7 +756,7 @@ html, body {
   letter-spacing: -0.3px;
 }
 
-.rec-detail { font-size: 12px; color: var(--ink-3); line-height: 1.55; }
+.rec-detail { font-size: 12px; color: var(--ink-2); line-height: 1.55; }
 
 .rec-meta {
   display: flex;
@@ -955,7 +986,7 @@ html, body {
   line-height: 1.35;
 }
 
-.rec-strip-detail { font-size: 11px; color: var(--ink-3); line-height: 1.4; flex: 1; }
+.rec-strip-detail { font-size: 11px; color: var(--ink-2); line-height: 1.4; flex: 1; }
 
 .rec-strip-actions { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
 
@@ -1195,7 +1226,7 @@ html, body {
   transition: color 0.15s;
 }
 
-.nav-btn .nav-icon { font-size: 20px; }
+.nav-btn .nav-icon { font-size: 15px; font-family: var(--font); line-height: 1; }
 .nav-btn.active { color: var(--gold); }
 .nav-btn:hover { color: var(--ink-2); }
 

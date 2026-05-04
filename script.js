@@ -879,20 +879,19 @@ function renderStars(rating) {
 // ===== ACTIVITY ICON =====
 function typeIcon(type) {
   const icons = {
-    flight:   '✈️',
-    train:    '🚄',
-    car:      '🚗',
-    sleep:    '🔑',
-    food:     '🍴',
-    activity: '📍',
-    ceremony: '💍',
-    party:    '🎉',
-    note:     '💬',
-    // legacy fallbacks
-    transport: '✈️',
-    hotel:     '🔑',
+    flight:    '✈',
+    train:     '◈',
+    car:       '◆',
+    sleep:     '◇',
+    food:      '●',
+    activity:  '✦',
+    ceremony:  '◆',
+    party:     '★',
+    note:      '○',
+    transport: '✈',
+    hotel:     '◇',
   };
-  return icons[type] || '📍';
+  return icons[type] || '✦';
 }
 
 // ===== TOAST =====
