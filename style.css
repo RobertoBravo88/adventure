@@ -38,10 +38,6 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-body {
-  background: radial-gradient(ellipse at top left, #261020 0%, #150810 60%, #120710 100%);
-  background-attachment: fixed;
-}
 
 /* ===== SCREEN SYSTEM ===== */
 .screen {
@@ -50,7 +46,7 @@ body {
   min-height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
-  background: transparent;
+  background: var(--bg);
 }
 
 .screen.active { display: flex; }
