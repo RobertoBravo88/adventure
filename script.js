@@ -15,12 +15,15 @@ function shouldShowInstall() {
 
 function showInstallPrompt() {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isAndroid = /android/i.test(navigator.userAgent);
+
   if (isIOS) {
     document.getElementById('install-steps-ios').style.display = 'flex';
   } else if (deferredInstallPrompt) {
     document.getElementById('install-btn').style.display = 'block';
+  } else if (isAndroid) {
+    document.getElementById('install-steps-android').style.display = 'flex';
   } else {
-    // Neither iOS nor Android install available — skip straight through
     skipInstall(); return;
   }
   showScreen('install-screen');
