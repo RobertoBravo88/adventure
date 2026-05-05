@@ -1953,11 +1953,16 @@ function initDaySwipe() {
   let startX = 0, startY = 0;
 
   screen.addEventListener('touchstart', e => {
+    // Ignore touches that start inside a horizontally scrollable strip
+    if (e.target.closest('.rec-strip, .rec-filter-row, .day-rec-section')) {
+      startX = null; return;
+    }
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
   }, { passive: true });
 
   screen.addEventListener('touchend', e => {
+    if (startX === null) return;
     const dx = e.changedTouches[0].clientX - startX;
     const dy = e.changedTouches[0].clientY - startY;
     // Only trigger if clearly horizontal and far enough
