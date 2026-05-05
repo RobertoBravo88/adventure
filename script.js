@@ -211,6 +211,7 @@ let dayRecCategory = "all";
 let likedRecs = new Set();
 let addedRecs = {};
 let customRecs = [];
+let customRecsMap = {};
 let trashedItems = {};
 let notesList = {};
 let noteSortBy = 'date';
@@ -290,6 +291,8 @@ function initFirebase() {
   });
   tripRef.child('customRecs').on('value', snap => {
     customRecs = snap.val() ? Object.values(snap.val()) : [];
+    customRecsMap = {};
+    customRecs.forEach(r => { customRecsMap[r.id] = r; });
     refreshCurrentScreen();
   });
   tripRef.child('trash').on('value', snap => {
@@ -454,11 +457,13 @@ function renderDayDetail(day) {
       const item = document.createElement('div');
       item.className = 'activity-item';
       item.innerHTML = `
+        <div class="drag-handle" title="Hold to reorder">⠿</div>
         <span class="activity-icon">${typeIcon(activity.type)}</span>
         <div class="activity-body">
           <div class="activity-name">${activity.name}</div>
           ${activity.detail ? `<div class="activity-detail">${activity.detail}</div>` : ''}
           ${activity.mapsUrl ? `<a href="${activity.mapsUrl}" target="_blank" class="maps-link" style="font-size:11px;margin-top:3px;display:inline-block">View on Maps ↗</a>` : ''}
+          <input type="time" class="activity-time-input" value="${activity.time || ''}" onchange="updateActivityTime(${day.id}, ${activity.id}, this.value)" />
         </div>
         <div class="activity-actions">
           <button class="like-btn ${activity.liked ? 'liked' : ''}" onclick="toggleLike(${day.id}, ${activity.id})">♡</button>
@@ -468,6 +473,7 @@ function renderDayDetail(day) {
       list.appendChild(item);
     });
     content.appendChild(list);
+    initDragDrop(list, day);
   } else if (!day.city) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
@@ -761,23 +767,45 @@ function closeModal() {
 }
 
 // ===== ADD / DELETE CUSTOM REC =====
-function addCustomRec() {
+async function fetchPhotoForPlace(name) {
+  if (!name) return null;
+  try {
+    const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.thumbnail?.source || null;
+  } catch { return null; }
+}
+
+async function addCustomRec() {
   const name = document.getElementById('new-rec-name').value.trim();
   const detail = document.getElementById('new-rec-detail').value.trim();
   const mapsUrl = document.getElementById('new-rec-maps').value.trim() || null;
   const category = document.getElementById('new-rec-category').value;
   const city = document.getElementById('new-rec-city').value;
   if (!name) { showToast('Add a name first'); return; }
+
   const id = `custom_${Date.now()}`;
-  tripRef.child(`customRecs/${id}`).set({ id, city, category, name, detail, mapsUrl, custom: true });
+  let photo = null;
+
+  if (mapsUrl) {
+    showToast('Adding place...');
+    const searchName = parseMapsUrl(mapsUrl) || name;
+    photo = await fetchPhotoForPlace(searchName);
+    if (!photo) photo = await fetchPhotoForPlace(name);
+  }
+
+  const rec = { id, city, category, name, detail, mapsUrl, custom: true };
+  if (photo) rec.photo = photo;
+  tripRef.child(`customRecs/${id}`).set(rec);
   document.getElementById('new-rec-name').value = '';
   document.getElementById('new-rec-detail').value = '';
   document.getElementById('new-rec-maps').value = '';
-  showToast('Place added ✓');
+  showToast(photo ? 'Place added with photo ✓' : 'Place added ✓');
 }
 
 function deleteCustomRec(id) {
-  const rec = customRecs.find(r => r.id === id);
+  const rec = customRecsMap[id] || customRecs.find(r => r.id === id);
   if (rec) moveToTrash('customRec', rec);
   tripRef.child(`customRecs/${id}`).remove();
   if (addedRecs[id]) { delete addedRecs[id]; saveAddedRecs(); }
@@ -1040,6 +1068,11 @@ function deleteNote(noteId) {
 
 function deleteCurrentNote() {
   if (!currentNoteId) { showScreen('notes-screen'); return; }
+  if (!notesList[currentNoteId]) {
+    // Note was never saved — nothing to trash, just discard
+    showScreen('notes-screen');
+    return;
+  }
   deleteNote(currentNoteId);
   showScreen('notes-screen');
 }
@@ -1085,12 +1118,145 @@ function showToast(message) {
   toastTimeout = setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
+// ===== TIME & SORT =====
+function updateActivityTime(dayId, activityId, val) {
+  const day = TRIP.days.find(d => d.id === dayId);
+  const act = day?.activities.find(a => a.id === activityId);
+  if (!act) return;
+  if (val) {
+    act.time = val;
+    sortActivitiesByTime(day);
+  } else {
+    delete act.time;
+  }
+  saveDayState();
+  renderDayDetail(day);
+}
+
+function sortActivitiesByTime(day) {
+  day.activities.sort((a, b) => {
+    if (a.time && b.time) return a.time.localeCompare(b.time);
+    if (a.time && !b.time) return -1;
+    if (!a.time && b.time) return 1;
+    return 0;
+  });
+}
+
+// ===== DRAG & DROP =====
+function applyDragTimeRule(day, movedIdx) {
+  const item = day.activities[movedIdx];
+  if (!item?.time) return;
+  const above = day.activities[movedIdx - 1];
+  const below = day.activities[movedIdx + 1];
+  if ((above?.time && item.time < above.time) || (below?.time && item.time > below.time)) {
+    delete item.time;
+  }
+}
+
+function initDragDrop(listEl, day) {
+  let active = null;
+  let pressTimer = null;
+
+  listEl.addEventListener('pointerdown', e => {
+    const item = e.target.closest('.activity-item');
+    if (!item || e.target.closest('button, a, input, select')) return;
+
+    const sx = e.clientX, sy = e.clientY, pid = e.pointerId;
+
+    pressTimer = setTimeout(() => {
+      const actItems = [...listEl.querySelectorAll('.activity-item')];
+      const actIdx = actItems.indexOf(item);
+      if (actIdx === -1) return;
+
+      const rect = item.getBoundingClientRect();
+      const ghost = item.cloneNode(true);
+      ghost.className = 'activity-item drag-ghost';
+      Object.assign(ghost.style, {
+        position: 'fixed', top: rect.top + 'px', left: rect.left + 'px',
+        width: rect.width + 'px', zIndex: '999', pointerEvents: 'none',
+      });
+      document.body.appendChild(ghost);
+
+      const ph = document.createElement('div');
+      ph.className = 'drag-placeholder';
+      ph.style.height = rect.height + 'px';
+      item.after(ph);
+      item.classList.add('is-dragging');
+
+      try { item.setPointerCapture(pid); } catch(_) {}
+      active = { el: item, actIdx, ghost, ph, offsetY: e.clientY - rect.top };
+    }, 450);
+
+    const cancelOnMove = ev => {
+      if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) > 8) {
+        clearTimeout(pressTimer); pressTimer = null;
+        listEl.removeEventListener('pointermove', cancelOnMove);
+      }
+    };
+    listEl.addEventListener('pointermove', cancelOnMove);
+    listEl.addEventListener('pointerup', () => {
+      clearTimeout(pressTimer); pressTimer = null;
+      listEl.removeEventListener('pointermove', cancelOnMove);
+    }, { once: true });
+  });
+
+  listEl.addEventListener('pointermove', e => {
+    if (!active) return;
+    e.preventDefault();
+    const { ghost, ph, el, offsetY } = active;
+    ghost.style.top = (e.clientY - offsetY) + 'px';
+
+    const nonDragged = [...listEl.querySelectorAll('.activity-item')].filter(i => i !== el);
+    let placed = false;
+    for (const it of nonDragged) {
+      const r = it.getBoundingClientRect();
+      if (e.clientY < r.top + r.height / 2) { it.before(ph); placed = true; break; }
+    }
+    if (!placed) listEl.appendChild(ph);
+  }, { passive: false });
+
+  const finish = () => {
+    if (!active) return;
+    const { el, actIdx, ghost, ph } = active;
+    active = null;
+
+    let newIdx = 0, counted = 0;
+    for (const child of listEl.children) {
+      if (child === ph) { newIdx = counted; break; }
+      if (child.classList.contains('activity-item') && child !== el) counted++;
+    }
+
+    ghost.remove(); ph.remove();
+    el.classList.remove('is-dragging');
+
+    if (newIdx !== actIdx) {
+      const moved = day.activities.splice(actIdx, 1)[0];
+      day.activities.splice(newIdx, 0, moved);
+      applyDragTimeRule(day, newIdx);
+      saveDayState();
+      renderDayDetail(day);
+      renderItinerary();
+    }
+  };
+
+  const cancel = () => {
+    if (!active) return;
+    const { el, ghost, ph } = active;
+    active = null;
+    ghost.remove(); ph.remove();
+    el.classList.remove('is-dragging');
+  };
+
+  listEl.addEventListener('pointerup', finish);
+  listEl.addEventListener('pointercancel', cancel);
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   initFirebase();
   renderItinerary();
   renderTransport();
-  renderNotes();
+  renderNotesList();
 
   document.getElementById('new-activity-input')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') addActivity();
