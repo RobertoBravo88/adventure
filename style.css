@@ -2704,6 +2704,12 @@ html, body {
   pointer-events: none;
 }
 
+/* ===== DAY SWIPE TRANSITION ===== */
+.day-swipe-fade {
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
 /* ===== SMALL PHONES (≤ 360px) ===== */
 @media (max-width: 360px) {
   .app-header { padding: 12px 14px; }

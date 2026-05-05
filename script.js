@@ -1947,6 +1947,47 @@ function renderHighlights() {
   }
 }
 
+// ===== DAY SWIPE =====
+function initDaySwipe() {
+  const screen = document.getElementById('day-detail-screen');
+  let startX = 0, startY = 0;
+
+  screen.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+
+  screen.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    // Only trigger if clearly horizontal and far enough
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+    const idx = TRIP.days.findIndex(d => d.id === currentDayId);
+    if (dx < 0 && idx < TRIP.days.length - 1) {
+      navigateDay(TRIP.days[idx + 1].id);  // swipe left → next
+    } else if (dx > 0 && idx > 0) {
+      navigateDay(TRIP.days[idx - 1].id);  // swipe right → previous
+    }
+  }, { passive: true });
+}
+
+function navigateDay(dayId) {
+  currentDayId = dayId;
+  dayRecCategory = 'all';
+  const day = TRIP.days.find(d => d.id === dayId);
+  if (!day) return;
+  document.getElementById('day-detail-title').textContent = `Day ${day.id}`;
+
+  const scroll = document.querySelector('.day-detail-scroll');
+  scroll.classList.add('day-swipe-fade');
+  setTimeout(() => {
+    renderDayDetail(day);
+    scroll.scrollTop = 0;
+    scroll.classList.remove('day-swipe-fade');
+  }, 120);
+}
+
 // ===== INIT =====
 function handleBackNavigation() {
   history.pushState(null, ''); // keep a state so back fires again next time
@@ -1971,6 +2012,7 @@ function handleBackNavigation() {
 document.addEventListener('DOMContentLoaded', () => {
   history.pushState(null, ''); // initial entry so back button fires popstate
   window.addEventListener('popstate', handleBackNavigation);
+  initDaySwipe();
   initPasswordCheck();
   initFirebase();
   migrateActivityTimes();
