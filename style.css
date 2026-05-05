@@ -51,6 +51,91 @@ html, body {
 
 .screen.active { display: flex; }
 
+/* ===== INSTALL SCREEN ===== */
+#install-screen {
+  align-items: flex-start;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.install-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1748&auto=format&fit=crop');
+}
+
+.install-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,3,8,0.97) 0%, rgba(10,3,8,0.75) 45%, rgba(10,3,8,0.35) 100%);
+}
+
+.install-content {
+  position: relative;
+  z-index: 1;
+  padding: 0 clamp(20px, 6vw, 32px) clamp(48px, 10vw, 72px);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.install-icon {
+  font-size: 36px;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.install-title {
+  font-family: var(--font);
+  font-size: clamp(26px, 7vw, 34px);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.install-subtitle {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.65;
+  max-width: 300px;
+}
+
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 4px 0 8px;
+}
+
+.install-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.install-step strong { color: var(--ink); }
+
+.install-step-icon {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 /* ===== PASSWORD SCREEN ===== */
 #password-screen {
   align-items: flex-start;

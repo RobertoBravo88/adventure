@@ -1,3 +1,44 @@
+// ===== INSTALL PROMPT =====
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+
+function shouldShowInstall() {
+  if (localStorage.getItem('adventure_install_shown')) return false;
+  if (window.navigator.standalone) return false; // already installed on iOS
+  if (window.matchMedia('(display-mode: standalone)').matches) return false; // already installed
+  return true;
+}
+
+function showInstallPrompt() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    document.getElementById('install-steps-ios').style.display = 'flex';
+  } else if (deferredInstallPrompt) {
+    document.getElementById('install-btn').style.display = 'block';
+  } else {
+    // Neither iOS nor Android install available — skip straight through
+    skipInstall(); return;
+  }
+  showScreen('install-screen');
+}
+
+async function triggerInstall() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  skipInstall();
+}
+
+function skipInstall() {
+  localStorage.setItem('adventure_install_shown', '1');
+  showScreen('welcome-screen');
+}
+
 // ===== PASSWORD =====
 const PASSWORD = 'Neo';
 
@@ -6,7 +47,7 @@ function checkPassword() {
   const error = document.getElementById('password-error');
   if (input === PASSWORD) {
     localStorage.setItem('adventure_unlocked', '1');
-    showScreen('welcome-screen');
+    if (shouldShowInstall()) { showInstallPrompt(); } else { showScreen('welcome-screen'); }
   } else {
     error.textContent = 'Try again ♡';
     document.getElementById('password-input').value = '';

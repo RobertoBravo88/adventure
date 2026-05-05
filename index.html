@@ -31,6 +31,23 @@
     <div id="password-bg" class="password-bg"></div>
   </div>
 
+  <!-- ===== INSTALL PROMPT SCREEN ===== -->
+  <div id="install-screen" class="screen">
+    <div class="install-content">
+      <div class="install-icon">♡</div>
+      <h2 class="install-title">Add to your home screen</h2>
+      <p class="install-subtitle">Get the full experience — open Adventure like a real app, no browser bar.</p>
+      <div class="install-steps" id="install-steps-ios" style="display:none">
+        <div class="install-step"><span class="install-step-icon">①</span> Tap the <strong>Share</strong> button at the bottom of your browser</div>
+        <div class="install-step"><span class="install-step-icon">②</span> Scroll down and tap <strong>Add to Home Screen</strong></div>
+        <div class="install-step"><span class="install-step-icon">③</span> Tap <strong>Add</strong> — done ♡</div>
+      </div>
+      <button class="btn-primary" id="install-btn" onclick="triggerInstall()" style="display:none;width:100%">Add to Home Screen</button>
+      <button class="btn-secondary" onclick="skipInstall()" style="width:100%;margin-top:12px">Maybe later</button>
+    </div>
+    <div class="install-bg"></div>
+  </div>
+
   <!-- ===== WELCOME SCREEN ===== -->
   <div id="welcome-screen" class="screen active">
     <div class="welcome-content">
