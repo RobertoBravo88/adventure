@@ -1948,7 +1948,29 @@ function renderHighlights() {
 }
 
 // ===== INIT =====
+function handleBackNavigation() {
+  history.pushState(null, ''); // keep a state so back fires again next time
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+  switch (active.id) {
+    case 'itinerary-screen':      showScreen('welcome-screen'); break;
+    case 'day-detail-screen':     showScreen('itinerary-screen'); break;
+    case 'discover-screen':       showScreen('itinerary-screen'); break;
+    case 'transport-screen':      showScreen('itinerary-screen'); break;
+    case 'notes-screen':          showScreen('itinerary-screen'); break;
+    case 'highlights-screen':     showScreen('itinerary-screen'); break;
+    case 'trash-screen':          showScreen('itinerary-screen'); break;
+    case 'note-edit-screen':      closeNoteEditor(); break;
+    case 'activity-edit-screen':  closeActivityEdit(); break;
+    case 'journal-edit-screen':   closeJournalEditor(); break;
+    case 'install-screen':        skipInstall(); break;
+    // password-screen / welcome-screen: let the OS handle it (exit app)
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  history.pushState(null, ''); // initial entry so back button fires popstate
+  window.addEventListener('popstate', handleBackNavigation);
   initPasswordCheck();
   initFirebase();
   migrateActivityTimes();
