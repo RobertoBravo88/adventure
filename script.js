@@ -14,6 +14,42 @@ function checkPassword() {
   }
 }
 
+function migrateActivityTimes() {
+  tripRef.child('activityTimesMigrated').once('value', snap => {
+    if (snap.val()) return;
+    // Patches: { activityId: { name, time?, detail? } }
+    const patches = {
+      6:  { name: 'Check in at venue',        time: '15:00' },
+      8:  { name: 'Take your seats',           time: '15:50' },
+      9:  { name: 'Wedding Ceremony',          time: '16:00' },
+      10: { name: 'Wedding Dinner',            time: '17:00' },
+      11: { name: 'Wedding Cake',              time: '18:30' },
+      12: { name: 'Party!',                    time: '19:00', detail: 'Dance until your feet hurt — until 04:00' },
+      14: { name: 'Wedding Breakfast',         time: '09:00' },
+      15: { name: 'Check out',                 detail: 'Pack the night before if possible — by 11:30' },
+      17: { time: '11:15' },
+      24: { time: '16:35' },
+    };
+    tripRef.child('dayState').once('value', snap => {
+      const state = snap.val();
+      if (!state) { tripRef.child('activityTimesMigrated').set(true); return; }
+      let changed = false;
+      Object.keys(state).forEach(dayKey => {
+        const acts = state[dayKey];
+        if (!Array.isArray(acts)) return;
+        acts.forEach((act, i) => {
+          const patch = patches[act.id];
+          if (!patch) return;
+          Object.assign(acts[i], patch);
+          changed = true;
+        });
+      });
+      if (changed) tripRef.child('dayState').set(state);
+      tripRef.child('activityTimesMigrated').set(true);
+    });
+  });
+}
+
 function seedNotes() {
   tripRef.child('notesSeeded').once('value', snap => {
     if (snap.val()) return;
@@ -1871,6 +1907,7 @@ function renderHighlights() {
 document.addEventListener('DOMContentLoaded', () => {
   initPasswordCheck();
   initFirebase();
+  migrateActivityTimes();
   seedNotes();
   renderItinerary();
   renderTransport();
