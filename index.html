@@ -10,6 +10,21 @@
 </head>
 <body>
 
+  <!-- ===== PASSWORD SCREEN ===== -->
+  <div id="password-screen" class="screen active">
+    <div class="password-content">
+      <p class="welcome-eyebrow">A trip for two ♡</p>
+      <h1 class="welcome-title">Adventure</h1>
+      <p class="password-hint">Enter the password to open your trip</p>
+      <div class="password-form">
+        <input type="password" id="password-input" class="password-input" placeholder="Password" onkeydown="if(event.key==='Enter') checkPassword()" autocomplete="off" />
+        <p class="password-error" id="password-error"></p>
+        <button class="btn-primary" onclick="checkPassword()">Unlock ♡</button>
+      </div>
+    </div>
+    <div id="password-bg" class="password-bg"></div>
+  </div>
+
   <!-- ===== WELCOME SCREEN ===== -->
   <div id="welcome-screen" class="screen active">
     <div class="welcome-content">
@@ -19,7 +34,7 @@
       <p class="welcome-dates" id="welcome-dates"></p>
       <p class="welcome-countdown" id="welcome-countdown"></p>
       <p class="welcome-message" id="welcome-message"></p>
-      <button class="btn-primary" onclick="showScreen('itinerary-screen')">Open our trip ♡</button>
+      <button class="btn-primary" onclick="showScreen('itinerary-screen')">Let's go ♡</button>
     </div>
     <div id="welcome-bg-photo"></div>
   </div>

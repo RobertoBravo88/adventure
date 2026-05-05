@@ -1,3 +1,26 @@
+// ===== PASSWORD =====
+const PASSWORD = 'Neo';
+
+function checkPassword() {
+  const input = document.getElementById('password-input').value;
+  const error = document.getElementById('password-error');
+  if (input === PASSWORD) {
+    localStorage.setItem('adventure_unlocked', '1');
+    showScreen('welcome-screen');
+  } else {
+    error.textContent = 'Try again ♡';
+    document.getElementById('password-input').value = '';
+    document.getElementById('password-input').focus();
+  }
+}
+
+function initPasswordCheck() {
+  if (localStorage.getItem('adventure_unlocked') === '1') {
+    showScreen('welcome-screen');
+  }
+  // otherwise password-screen stays active (it's the default)
+}
+
 // ===== TRIP DATA =====
 
 const TRIP = {
@@ -1833,6 +1856,7 @@ function renderHighlights() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+  initPasswordCheck();
   initFirebase();
   renderItinerary();
   renderTransport();

@@ -50,6 +50,78 @@ html, body {
 
 .screen.active { display: flex; }
 
+/* ===== PASSWORD SCREEN ===== */
+#password-screen {
+  align-items: flex-start;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.password-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1748&auto=format&fit=crop');
+}
+
+.password-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,3,8,0.97) 0%, rgba(10,3,8,0.75) 45%, rgba(10,3,8,0.35) 100%);
+}
+
+.password-content {
+  position: relative;
+  z-index: 1;
+  padding: 0 clamp(20px, 6vw, 32px) clamp(48px, 10vw, 72px);
+  width: 100%;
+}
+
+.password-hint {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-bottom: 20px;
+  font-family: var(--font);
+  letter-spacing: 0.04em;
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.password-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 16px;
+  background: rgba(31,13,22,0.8);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+  letter-spacing: 0.1em;
+}
+
+.password-input::placeholder { color: var(--ink-3); }
+.password-input:focus { border-color: var(--gold); }
+
+.password-error {
+  font-family: var(--font);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  min-height: 16px;
+  margin: -4px 0;
+}
+
 /* ===== WELCOME SCREEN ===== */
 #welcome-screen {
   align-items: flex-start;
