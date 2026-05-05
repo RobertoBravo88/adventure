@@ -14,6 +14,21 @@ function checkPassword() {
   }
 }
 
+function seedNotes() {
+  tripRef.child('notesSeeded').once('value', snap => {
+    if (snap.val()) return;
+    const notes = [
+      { id: 'note_seed_checkout_florence', title: 'Check out Hotel Palazzo Borghini', body: 'Check-out 07:00 – 11:00 — early start today', linkedDays: [13] },
+      { id: 'note_seed_home',              title: 'Home sweet home ♡',                body: 'What an adventure — already looking forward to the next one', linkedDays: [13] },
+    ];
+    const now = Date.now();
+    notes.forEach(n => {
+      tripRef.child(`notesList/${n.id}`).set({ ...n, createdAt: now, updatedAt: now });
+    });
+    tripRef.child('notesSeeded').set(true);
+  });
+}
+
 function initPasswordCheck() {
   if (localStorage.getItem('adventure_unlocked') === '1') {
     showScreen('welcome-screen');
@@ -148,10 +163,8 @@ const TRIP = {
       date: "Mon, May 25",
       city: null,
       activities: [
-        { id: 22, type: "note",   name: "Check out Hotel Palazzo Borghini", detail: "Check-out 07:00 – 11:00 — early start today", liked: false },
         { id: 23, type: "train",  name: "Train Florence → Bologna Centrale", detail: "Frecciarossa · ~35 min · Book at Trenitalia.com", liked: false },
         { id: 24, type: "flight", name: "FR4863 · Bologna → Brussels Charleroi", detail: "Departs 16:35 · Arrives 18:20 · Booking: T8L9GE", time: "16:35", liked: false },
-        { id: 25, type: "note",   name: "Home sweet home ♡", detail: "What an adventure — already looking forward to the next one", liked: true },
       ]
     },
   ]
@@ -1858,6 +1871,7 @@ function renderHighlights() {
 document.addEventListener('DOMContentLoaded', () => {
   initPasswordCheck();
   initFirebase();
+  seedNotes();
   renderItinerary();
   renderTransport();
   renderNotesList();
