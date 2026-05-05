@@ -17,6 +17,7 @@
       <h1 class="welcome-title">Adventure</h1>
       <p class="welcome-subtitle" id="welcome-destination"></p>
       <p class="welcome-dates" id="welcome-dates"></p>
+      <p class="welcome-countdown" id="welcome-countdown"></p>
       <p class="welcome-message" id="welcome-message"></p>
       <button class="btn-primary" onclick="showScreen('itinerary-screen')">Open our trip ♡</button>
     </div>
@@ -28,7 +29,10 @@
     <header class="app-header">
       <button class="back-btn" onclick="showScreen('welcome-screen')">←</button>
       <h2 class="header-title">Our Itinerary</h2>
-      <button class="icon-btn" onclick="showScreen('trash-screen')" title="Trash">⊘</button>
+      <div style="display:flex;gap:4px">
+        <button class="icon-btn" onclick="showScreen('highlights-screen')" title="Highlights" style="font-size:16px">♡</button>
+        <button class="icon-btn" onclick="showScreen('trash-screen')" title="Trash">⊘</button>
+      </div>
     </header>
     <div class="trip-summary">
       <div class="summary-item">
@@ -74,18 +78,22 @@
         <div class="rec-strip" id="day-rec-strip"></div>
       </div>
 
+      <!-- Day journal / memory section -->
+      <div id="day-journal-section" class="day-journal-section"></div>
+
       <!-- Add custom activity -->
       <div class="add-activity-section">
         <h3 class="section-label">Add your own</h3>
         <div class="add-activity-form">
           <input type="text" id="new-activity-input" placeholder="e.g. Dinner somewhere special" class="text-input" />
-          <select id="new-activity-type" class="select-input">
-            <option value="activity">🎯 Activity</option>
-            <option value="food">🍽 Food & Drink</option>
-            <option value="transport">✈️ Transport</option>
-            <option value="hotel">🏨 Hotel</option>
-            <option value="note">📝 Note</option>
+          <select id="new-activity-type" class="select-input" onchange="onActivityTypeChange(this)">
+            <option value="activity">✦ Activity</option>
+            <option value="food">● Food & Drink</option>
+            <option value="transport">✈ Transport</option>
+            <option value="hotel">◇ Hotel</option>
+            <option value="note">○ Note</option>
           </select>
+          <textarea id="new-activity-note" class="text-input activity-note-textarea" placeholder="Write your note here…" style="display:none"></textarea>
           <button class="btn-primary small" onclick="addActivity()">Add</button>
         </div>
       </div>
@@ -179,6 +187,7 @@
       <button class="filter-btn" data-sort="date-asc" onclick="setNoteSort('date','asc')">Oldest</button>
       <button class="filter-btn" data-sort="title-asc" onclick="setNoteSort('title','asc')">A → Z</button>
       <button class="filter-btn" data-sort="title-desc" onclick="setNoteSort('title','desc')">Z → A</button>
+      <button class="filter-btn" data-sort="day-asc" onclick="setNoteSort('day','asc')">By Day</button>
     </div>
     <div class="notes-list" id="notes-list"></div>
     <nav class="bottom-nav">
@@ -199,10 +208,91 @@
     <div class="note-editor">
       <input type="text" id="note-title-input" placeholder="Title" class="note-title-input" />
       <textarea id="note-body-input" class="note-body-input" placeholder="Write your note here..."></textarea>
+      <div class="note-link-section">
+        <p class="note-link-section-label">Linked days</p>
+        <div class="note-linked-chips" id="note-linked-chips"></div>
+        <button class="note-link-day-btn" onclick="openNoteDayLinkerFromEditor()">+ Link to a day</button>
+      </div>
     </div>
     <div class="note-editor-footer">
       <button class="btn-primary" onclick="saveCurrentNote()" style="width:100%">Save note</button>
     </div>
+  </div>
+
+  <!-- ===== ACTIVITY EDIT SCREEN ===== -->
+  <div id="activity-edit-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="closeActivityEdit()">←</button>
+      <h2 class="header-title">Edit</h2>
+      <button class="icon-btn" onclick="deleteCurrentActivity()" style="color:var(--ink-3);font-size:14px">✕</button>
+    </header>
+    <div class="activity-edit-scroll">
+
+      <!-- Hero: photo bg or plain surface -->
+      <div class="activity-edit-hero" id="activity-edit-hero">
+        <div class="activity-edit-photo-bg" id="activity-edit-photo-bg"></div>
+        <div class="activity-edit-hero-content">
+          <span class="activity-edit-type-icon" id="activity-edit-type-icon"></span>
+          <p class="activity-edit-day-info" id="activity-edit-day-info"></p>
+          <div class="activity-edit-rec-row" id="activity-edit-rec-row" style="display:none">
+            <span id="activity-edit-stars"></span>
+            <a id="activity-edit-maps" href="#" target="_blank" class="activity-maps-link" style="display:none">View on Maps ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="activity-edit-form">
+        <input type="text" id="activity-edit-title" class="activity-edit-title-input" placeholder="Activity name" />
+        <div class="activity-edit-rule"></div>
+        <label class="edit-label">Description</label>
+        <textarea id="activity-edit-detail" class="activity-edit-textarea" placeholder="Add a note..."></textarea>
+        <label class="edit-label">Time</label>
+        <input type="time" id="activity-edit-time" class="activity-time-input" />
+      </div>
+
+    </div>
+    <div class="note-editor-footer">
+      <button class="btn-primary" onclick="saveActivityEdit()" style="width:100%">Save</button>
+    </div>
+  </div>
+
+  <!-- ===== JOURNAL EDIT SCREEN ===== -->
+  <div id="journal-edit-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="closeJournalEditor()">←</button>
+      <h2 class="header-title" id="journal-edit-header">Our Day</h2>
+      <div style="width:40px"></div>
+    </header>
+    <div class="journal-edit-scroll">
+      <div class="journal-photo-area" id="journal-photo-area">
+        <div class="journal-photo-bg" id="journal-photo-bg"></div>
+        <div class="journal-photo-overlay">
+          <input type="file" id="journal-photo-input" accept="image/*" style="display:none" onchange="handleJournalPhoto(this)">
+          <button class="journal-photo-btn" onclick="document.getElementById('journal-photo-input').click()">
+            <span>◈</span> <span id="journal-photo-btn-label">Add a photo</span>
+          </button>
+          <button class="journal-photo-remove-btn" id="journal-photo-remove-btn" onclick="removeJournalPhoto()" style="display:none">✕</button>
+        </div>
+      </div>
+      <div class="journal-form">
+        <label class="edit-label">How was your day?</label>
+        <textarea id="journal-text-input" class="journal-textarea" placeholder="Write about our day, what we saw, felt, ate and did..."></textarea>
+      </div>
+    </div>
+    <div class="note-editor-footer">
+      <button class="btn-primary" onclick="saveJournalEntry()" style="width:100%">Save memory ♡</button>
+    </div>
+  </div>
+
+  <!-- ===== HIGHLIGHTS SCREEN ===== -->
+  <div id="highlights-screen" class="screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="showScreen('itinerary-screen')">←</button>
+      <h2 class="header-title">Our Highlights</h2>
+      <div style="width:40px"></div>
+    </header>
+    <div class="highlights-content" id="highlights-content"></div>
   </div>
 
   <!-- ===== TRASH SCREEN ===== -->
@@ -219,7 +309,7 @@
   <div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal()">
     <div class="modal" onclick="event.stopPropagation()">
       <p class="modal-title" id="modal-rec-name"></p>
-      <p class="modal-label">Add to which day?</p>
+      <p class="modal-label" id="modal-label">Add to which day?</p>
       <div class="modal-days" id="modal-days"></div>
       <button class="btn-secondary" onclick="closeModal()">Cancel</button>
     </div>

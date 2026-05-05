@@ -4,7 +4,7 @@ const TRIP = {
   title: "Adventure",
   destination: "Poland · Rome · Florence",
   dates: "May 13 – 25, 2026",
-  message: "A wedding, two cities, and the open road — every moment with you is the best part of the trip ♡",
+  message: "A wedding, two cities, and you and me. Let's go on our own adventure ♡",
 
   days: [
     {
@@ -34,7 +34,7 @@ const TRIP = {
       city: null,
       activities: [
         { id: 5, type: "car",      name: "Drive Wrocław → Wedding Venue", detail: "Wrocławska 111, 55-114 Pierwoszów · 30 min north of Wrocław", liked: false },
-        { id: 6, type: "sleep",    name: "Check in at venue from 15:00", detail: "Collect keys at reception", liked: false },
+        { id: 6, type: "sleep",    name: "Check in at venue", detail: "Collect keys at reception", time: "15:00", liked: false },
         { id: 7, type: "activity", name: "Explore the venue & countryside", detail: "Enjoy the calm before the celebration ♡", liked: false },
       ]
     },
@@ -44,11 +44,11 @@ const TRIP = {
       date: "Sat, May 16",
       city: null,
       activities: [
-        { id: 8,  type: "ceremony", name: "15:50 — Take your seats", detail: "Ceremony behind the main building", liked: false },
-        { id: 9,  type: "ceremony", name: "16:00 — Wedding Ceremony", detail: "Joanna & Eric exchange vows", liked: true },
-        { id: 10, type: "food",     name: "17:00 — Wedding Dinner", detail: "Recharge and enjoy a lovely meal together", liked: false },
-        { id: 11, type: "food",     name: "18:30 — Wedding Cake", detail: "Watch them cut the cake", liked: false },
-        { id: 12, type: "party",    name: "19:00 – 04:00 — Party!", detail: "Dance until your feet hurt", liked: true },
+        { id: 8,  type: "ceremony", name: "Take your seats", detail: "Ceremony behind the main building", time: "15:50", liked: false },
+        { id: 9,  type: "ceremony", name: "Wedding Ceremony", detail: "Joanna & Eric exchange vows", time: "16:00", liked: true },
+        { id: 10, type: "food",     name: "Wedding Dinner", detail: "Recharge and enjoy a lovely meal together", time: "17:00", liked: false },
+        { id: 11, type: "food",     name: "Wedding Cake", detail: "Watch them cut the cake", time: "18:30", liked: false },
+        { id: 12, type: "party",    name: "Party!", detail: "Dance until your feet hurt — until 04:00", time: "19:00", liked: true },
         { id: 13, type: "note",     name: "Dress code: Tenue de Ville", detail: "Suit with tie · Cocktail dress or pant suit", liked: false },
       ]
     },
@@ -58,8 +58,8 @@ const TRIP = {
       date: "Sun, May 17",
       city: null,
       activities: [
-        { id: 14, type: "food",     name: "09:00 – 11:00 — Wedding Breakfast", detail: "Stories and laughter from the night before ♡", liked: false },
-        { id: 15, type: "note",     name: "Check out by 11:30", detail: "Pack the night before if possible", liked: false },
+        { id: 14, type: "food",     name: "Wedding Breakfast", detail: "Stories and laughter from the night before ♡", time: "09:00", liked: false },
+        { id: 15, type: "note",     name: "Check out", detail: "Pack the night before if possible — by 11:30", liked: false },
         { id: 16, type: "activity", name: "Relax, recover, reminisce", detail: "Take it slow today — you earned it", liked: true },
       ]
     },
@@ -69,7 +69,7 @@ const TRIP = {
       date: "Mon, May 18",
       city: null,
       activities: [
-        { id: 17, type: "flight", name: "FR2113 · Wrocław → Rome Ciampino", detail: "Departs 11:15 · Arrives 13:15 · Booking: J6K6FX", liked: false },
+        { id: 17, type: "flight", name: "FR2113 · Wrocław → Rome Ciampino", detail: "Departs 11:15 · Arrives 13:15 · Booking: J6K6FX", time: "11:15", liked: false },
         { id: 18, type: "sleep",  name: "Check in — The Social Hub Rome", detail: "Viale dello Scalo San Lorenzo, 10, 00185 · From 15:00", liked: false },
       ]
     },
@@ -127,7 +127,7 @@ const TRIP = {
       activities: [
         { id: 22, type: "note",   name: "Check out Hotel Palazzo Borghini", detail: "Check-out 07:00 – 11:00 — early start today", liked: false },
         { id: 23, type: "train",  name: "Train Florence → Bologna Centrale", detail: "Frecciarossa · ~35 min · Book at Trenitalia.com", liked: false },
-        { id: 24, type: "flight", name: "FR4863 · Bologna → Brussels Charleroi", detail: "Departs 16:35 · Arrives 18:20 · Booking: T8L9GE", liked: false },
+        { id: 24, type: "flight", name: "FR4863 · Bologna → Brussels Charleroi", detail: "Departs 16:35 · Arrives 18:20 · Booking: T8L9GE", time: "16:35", liked: false },
         { id: 25, type: "note",   name: "Home sweet home ♡", detail: "What an adventure — already looking forward to the next one", liked: true },
       ]
     },
@@ -213,10 +213,17 @@ let addedRecs = {};
 let customRecs = [];
 let customRecsMap = {};
 let trashedItems = {};
+let editingActivity = null;
 let notesList = {};
 let noteSortBy = 'date';
 let noteSortDir = 'desc';
 let currentNoteId = null;
+let noteLinkModalNoteId = null;
+let pendingLinkedDays = [];
+let journalEntries = {};
+let currentJournalDayId = null;
+let journalTempPhoto = null;
+let noteEditorOrigin = 'notes-screen';
 
 // ===== FIREBASE =====
 firebase.initializeApp({
@@ -285,9 +292,9 @@ function initFirebase() {
     applyDayState(snap.val());
     refreshCurrentScreen();
   });
-  tripRef.child('notes').on('value', snap => {
-    const el = document.getElementById('shared-notes');
-    if (el && document.activeElement !== el) el.value = snap.val() || '';
+  tripRef.child('journal').on('value', snap => {
+    journalEntries = snap.val() || {};
+    refreshCurrentScreen();
   });
   tripRef.child('customRecs').on('value', snap => {
     customRecs = snap.val() ? Object.values(snap.val()) : [];
@@ -328,6 +335,11 @@ function showScreen(screenId) {
   if (screenId === 'itinerary-screen') renderItinerary();
   if (screenId === 'notes-screen') renderNotesList();
   if (screenId === 'trash-screen') renderTrashScreen();
+  if (screenId === 'highlights-screen') renderHighlights();
+  if (screenId === 'day-detail-screen' && currentDayId) {
+    const day = TRIP.days.find(d => d.id === currentDayId);
+    if (day) renderDayDetail(day);
+  }
 
   // Sync nav active state
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -358,10 +370,24 @@ function openDay(dayId) {
 }
 
 // ===== RENDER ITINERARY =====
+function getTripCountdown() {
+  const start = new Date('2026-05-13T00:00:00');
+  const now = new Date(); now.setHours(0,0,0,0);
+  const diff = Math.round((start - now) / (1000*60*60*24));
+  if (diff > 1) return `${diff} days to go ✈`;
+  if (diff === 1) return `Tomorrow it begins ✈`;
+  if (diff === 0) return `Today is the day ✈`;
+  const dayNum = Math.round((now - start) / (1000*60*60*24)) + 1;
+  if (dayNum <= 13) return `Day ${dayNum} of the adventure`;
+  return `What an adventure ♡`;
+}
+
 function renderItinerary() {
   document.getElementById('welcome-destination').textContent = TRIP.destination;
   document.getElementById('welcome-dates').textContent = TRIP.dates;
   document.getElementById('welcome-message').textContent = `"${TRIP.message}"`;
+  const countdownEl = document.getElementById('welcome-countdown');
+  if (countdownEl) countdownEl.textContent = getTripCountdown();
   document.getElementById('summary-destination').textContent = TRIP.destination;
   document.getElementById('summary-days').textContent = TRIP.days.length;
 
@@ -406,12 +432,23 @@ function renderItinerary() {
 
     const likedCount = day.activities.filter(a => a.liked).length;
     const hasRecs = day.city !== null;
-    const preview = day.activities.length > 0 ? day.activities[0].name : (hasRecs ? 'Tap to discover things to do ✨' : 'No activities yet');
+    const planActivities = day.activities.filter(a => a.type !== 'note');
+    const previewAct = planActivities.length > 0 ? planActivities[0] : null;
+    const preview = previewAct
+      ? previewAct.name
+      : (hasRecs ? 'Tap to start planning ✨' : (day.activities.length > 0 ? day.activities[0].name : 'Tap to start planning ✨'));
+    const countLabel = planActivities.length > 0
+      ? `${planActivities.length} items${likedCount ? ` · ${likedCount} ♡` : ''}${hasRecs ? ' · ✨' : ''}`
+      : (hasRecs ? '✨ Discover' : '');
+
+    const journal = journalEntries[day.id];
+    const hasJournalPhoto = journal?.photo;
 
     const card = document.createElement('div');
-    card.className = 'day-card';
+    card.className = 'day-card' + (hasJournalPhoto ? ' has-journal-photo' : '');
     card.onclick = () => openDay(day.id);
     card.innerHTML = `
+      ${hasJournalPhoto ? `<div class="day-card-photo-bg" style="background-image:url('${hasJournalPhoto}')"></div>` : ''}
       <div class="day-card-top">
         <span class="day-number">Day ${day.id}</span>
         <span class="day-date">${day.date}</span>
@@ -419,8 +456,9 @@ function renderItinerary() {
       <div class="day-title">${day.title}</div>
       <div class="day-preview">
         <span>${preview}</span>
-        <span class="activity-count">${day.activities.length} items${likedCount ? ` · ${likedCount} ♡` : ''}${hasRecs ? ' · ✨' : ''}</span>
+        ${countLabel ? `<span class="activity-count">${countLabel}</span>` : ''}
       </div>
+      ${journal ? `<div class="day-card-memory-badge">◈ Memory</div>` : ''}
     `;
     (currentGroup || container).appendChild(card);
   });
@@ -441,8 +479,12 @@ function renderDayDetail(day) {
   `;
   content.appendChild(hero);
 
-  // Activities
-  if (day.activities.length > 0) {
+  const planActivities = day.activities.filter(a => a.type !== 'note');
+  const noteActivities = day.activities.filter(a => a.type === 'note');
+  const linkedNotes = getLinkedNotes(day.id);
+
+  // ── Plan section ──
+  if (planActivities.length > 0) {
     const label = document.createElement('p');
     label.className = 'section-label';
     label.textContent = 'Plan';
@@ -453,16 +495,22 @@ function renderDayDetail(day) {
     list.className = 'activities-list';
     list.style.padding = '0 16px';
 
-    day.activities.forEach(activity => {
+    planActivities.forEach(activity => {
+      const recInfo = activity.recId ? findRec(activity.recId) : null;
+      const recRating = recInfo?.rec?.rating || null;
+      const mapsUrl = activity.mapsUrl || recInfo?.rec?.mapsUrl || null;
+
       const item = document.createElement('div');
       item.className = 'activity-item';
+      item.dataset.activityId = activity.id;
       item.innerHTML = `
         <div class="drag-handle" title="Hold to reorder">⠿</div>
         <span class="activity-icon">${typeIcon(activity.type)}</span>
         <div class="activity-body">
-          <div class="activity-name">${activity.name}</div>
+          <div class="activity-name activity-name-btn" onclick="openActivityEdit(${day.id}, ${activity.id})">${activity.name}</div>
           ${activity.detail ? `<div class="activity-detail">${activity.detail}</div>` : ''}
-          ${activity.mapsUrl ? `<a href="${activity.mapsUrl}" target="_blank" class="maps-link" style="font-size:11px;margin-top:3px;display:inline-block">View on Maps ↗</a>` : ''}
+          ${recRating ? `<div class="activity-rating">${renderStars(recRating)}</div>` : ''}
+          ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" class="activity-maps-link">View on Maps ↗</a>` : ''}
           <input type="time" class="activity-time-input" value="${activity.time || ''}" onchange="updateActivityTime(${day.id}, ${activity.id}, this.value)" />
         </div>
         <div class="activity-actions">
@@ -474,13 +522,69 @@ function renderDayDetail(day) {
     });
     content.appendChild(list);
     initDragDrop(list, day);
-  } else if (!day.city) {
+  } else if (!day.city && noteActivities.length === 0 && linkedNotes.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     empty.style.padding = '32px 16px';
     empty.innerHTML = `<div class="empty-state-icon">✨</div><div class="empty-state-text">Nothing planned yet — add something below!</div>`;
     content.appendChild(empty);
   }
+
+  // ── Notes section ──
+  if (noteActivities.length > 0 || linkedNotes.length > 0) {
+    const notesSection = document.createElement('div');
+    notesSection.className = 'day-notes-section';
+
+    const notesLabel = document.createElement('p');
+    notesLabel.className = 'section-label';
+    notesLabel.textContent = 'Notes';
+    notesLabel.style.padding = '0 16px';
+    notesSection.appendChild(notesLabel);
+
+    const notesList_el = document.createElement('div');
+    notesList_el.className = 'activities-list';
+    notesList_el.style.padding = '0 16px';
+
+    noteActivities.forEach(activity => {
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.dataset.activityId = activity.id;
+      item.innerHTML = `
+        <span class="activity-icon">○</span>
+        <div class="activity-body">
+          <div class="activity-name activity-name-btn" onclick="openActivityEdit(${day.id}, ${activity.id})">${activity.name}</div>
+          ${activity.detail ? `<div class="activity-detail">${activity.detail}</div>` : ''}
+        </div>
+        <div class="activity-actions">
+          <button class="delete-btn" onclick="deleteActivity(${day.id}, ${activity.id})">✕</button>
+        </div>
+      `;
+      notesList_el.appendChild(item);
+    });
+
+    linkedNotes.forEach(note => {
+      const preview = (note.body || '').split('\n')[0].substring(0, 60);
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.innerHTML = `
+        <span class="activity-icon">○</span>
+        <div class="activity-body">
+          <div class="activity-name activity-name-btn" onclick="openNote('${note.id}')">${note.title || 'Untitled'}</div>
+          ${preview ? `<div class="activity-detail">${preview}</div>` : ''}
+        </div>
+        <div class="activity-actions">
+          <button class="delete-btn" onclick="unlinkNoteFromDay('${note.id}', ${day.id})">✕</button>
+        </div>
+      `;
+      notesList_el.appendChild(item);
+    });
+
+    notesSection.appendChild(notesList_el);
+    content.appendChild(notesSection);
+  }
+
+  // Journal / memory section
+  renderJournalSection(day);
 
   // Recommendations strip (city days only)
   const recSection = document.getElementById('day-rec-section');
@@ -600,6 +704,10 @@ function renderDiscoverScreen() {
   renderDiscoverFilters();
   renderDiscoverList();
   updateLikedBanner();
+  const isCrossCity = discoverCategory === 'liked' || discoverCategory === 'added';
+  document.querySelectorAll('.city-tab').forEach(tab => {
+    tab.classList.toggle('city-tab-dimmed', isCrossCity);
+  });
 }
 
 function renderDiscoverFilters() {
@@ -677,6 +785,7 @@ function renderDiscoverList() {
 function updateLikedBanner() {
   const banner = document.getElementById('liked-banner');
   const count = document.getElementById('liked-count');
+  if (!banner || !count) return;
   if (likedRecs.size > 0) {
     banner.style.display = 'block';
     count.textContent = likedRecs.size;
@@ -704,11 +813,13 @@ let modalRecId = null;
 
 function openAddToDay(recId) {
   modalRecId = recId;
+  noteLinkModalNoteId = null;
   const found = findRec(recId);
   if (!found) return;
   const { rec, city } = found;
 
   document.getElementById('modal-rec-name').textContent = rec.name;
+  document.getElementById('modal-label').textContent = 'Add to which day?';
 
   const relevantDays = TRIP.days.filter(d => d.city === city);
   const modalDays = document.getElementById('modal-days');
@@ -827,26 +938,47 @@ function parseMapsUrl(url) {
 }
 
 // ===== ADD CUSTOM ACTIVITY =====
+function onActivityTypeChange(select) {
+  const noteArea = document.getElementById('new-activity-note');
+  const input = document.getElementById('new-activity-input');
+  if (select.value === 'note') {
+    noteArea.style.display = 'block';
+    input.placeholder = 'Note title (optional)';
+  } else {
+    noteArea.style.display = 'none';
+    noteArea.value = '';
+    input.placeholder = 'e.g. Dinner somewhere special';
+  }
+}
+
 function addActivity() {
   const input = document.getElementById('new-activity-input');
   const typeSelect = document.getElementById('new-activity-type');
+  const noteArea = document.getElementById('new-activity-note');
   const raw = input.value.trim();
-  if (!raw) { showToast('Please type something first'); return; }
+  const isNote = typeSelect.value === 'note';
+  const noteBody = noteArea ? noteArea.value.trim() : '';
+
+  if (!raw && !noteBody) { showToast('Please type something first'); return; }
 
   const day = TRIP.days.find(d => d.id === currentDayId);
   if (!day) return;
 
-  let name = raw;
+  let name = raw || 'Note';
   let mapsUrl = null;
+  let detail = isNote ? noteBody : '';
 
-  if (raw.includes('google.com/maps') || raw.includes('maps.google.com') || raw.includes('goo.gl/maps')) {
+  if (!isNote && (raw.includes('google.com/maps') || raw.includes('maps.google.com') || raw.includes('goo.gl/maps'))) {
     const extracted = parseMapsUrl(raw);
     name = extracted || 'Place from Maps';
     mapsUrl = raw;
   }
 
-  day.activities.push({ id: nextActivityId++, type: typeSelect.value, name, detail: '', mapsUrl, liked: false });
+  day.activities.push({ id: nextActivityId++, type: typeSelect.value, name, detail, mapsUrl, liked: false });
   input.value = '';
+  if (noteArea) { noteArea.value = ''; noteArea.style.display = 'none'; }
+  input.placeholder = 'e.g. Dinner somewhere special';
+  typeSelect.value = 'activity';
   saveDayState();
   renderDayDetail(day);
   renderItinerary();
@@ -898,7 +1030,7 @@ function renderTransport() {
         <span class="transport-city">${t.to}</span>
       </div>
       <div class="transport-meta">${t.details.map(d => `<span>· ${d}</span>`).join('')}</div>
-      <a href="${t.trackUrl}" target="_blank" class="live-status-btn">🔴 Check live status</a>
+      <a href="${t.trackUrl}" target="_blank" class="live-status-btn"><span class="live-dot"></span>Check live status</a>
     `;
     container.appendChild(card);
   });
@@ -970,6 +1102,10 @@ function renderTrashScreen() {
 }
 
 // ===== NOTES =====
+function getLinkedNotes(dayId) {
+  return Object.values(notesList).filter(note => (note.linkedDays || []).includes(dayId));
+}
+
 function renderNotesList() {
   const container = document.getElementById('notes-list');
   if (!container) return;
@@ -978,14 +1114,26 @@ function renderNotesList() {
   // Pinned message card
   const pinned = document.createElement('div');
   pinned.className = 'note-card special';
-  pinned.innerHTML = `<p class="note-label">Message for you ◇</p><p class="note-text">${TRIP.message}</p>`;
+  pinned.innerHTML = `<p class="note-label">Message for you ◇</p><p class="note-text">I love you so so much</p>`;
   container.appendChild(pinned);
 
   let notes = Object.values(notesList);
+
   notes.sort((a, b) => {
     if (noteSortBy === 'date') return noteSortDir === 'desc' ? b.updatedAt - a.updatedAt : a.updatedAt - b.updatedAt;
-    const cmp = (a.title || '').localeCompare(b.title || '');
-    return noteSortDir === 'asc' ? cmp : -cmp;
+    if (noteSortBy === 'title') {
+      const cmp = (a.title || '').localeCompare(b.title || '');
+      return noteSortDir === 'asc' ? cmp : -cmp;
+    }
+    if (noteSortBy === 'day') {
+      const aDay = Math.min(...(a.linkedDays || []), Infinity);
+      const bDay = Math.min(...(b.linkedDays || []), Infinity);
+      if (aDay === Infinity && bDay === Infinity) return b.updatedAt - a.updatedAt;
+      if (aDay === Infinity) return 1;
+      if (bDay === Infinity) return -1;
+      return aDay - bDay;
+    }
+    return 0;
   });
 
   if (notes.length === 0) {
@@ -998,21 +1146,32 @@ function renderNotesList() {
   }
 
   notes.forEach(note => {
-    const date = new Date(note.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
+    const writtenDate = new Date(note.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     const preview = (note.body || '').split('\n')[0].substring(0, 70);
+    const linkedDays = (note.linkedDays || [])
+      .map(dayId => TRIP.days.find(d => d.id === dayId))
+      .filter(Boolean)
+      .sort((a, b) => a.id - b.id);
+
     const card = document.createElement('div');
     card.className = 'note-list-card';
     card.innerHTML = `
       <div class="note-list-content" onclick="openNote('${note.id}')">
         <div class="note-list-title">${note.title || 'Untitled'}</div>
         ${preview ? `<div class="note-list-preview">${preview}</div>` : ''}
-        <div class="note-list-date">${date}</div>
+        <div class="note-list-meta">
+          <span class="note-meta-written">Written ${writtenDate}</span>
+          ${linkedDays.length ? `<span class="note-meta-linked">◈ ${linkedDays.map(d => `Day ${d.id}`).join(', ')}</span>` : ''}
+        </div>
       </div>
-      <button class="note-delete-btn" onclick="deleteNote('${note.id}')">✕</button>
+      <div class="note-list-actions">
+        <button class="note-delete-btn" onclick="deleteNote('${note.id}')">✕</button>
+      </div>
     `;
     container.appendChild(card);
   });
 }
+
 
 function setNoteSort(by, dir) {
   noteSortBy = by; noteSortDir = dir;
@@ -1023,21 +1182,56 @@ function setNoteSort(by, dir) {
 }
 
 function openNewNote() {
+  noteEditorOrigin = document.querySelector('.screen.active')?.id || 'notes-screen';
   currentNoteId = `note_${Date.now()}`;
+  pendingLinkedDays = [];
   document.getElementById('note-title-input').value = '';
   document.getElementById('note-body-input').value = '';
   document.getElementById('note-edit-header').textContent = 'New Note';
+  renderNoteLinkedChips(currentNoteId);
   showScreen('note-edit-screen');
 }
 
 function openNote(noteId) {
   const note = notesList[noteId];
   if (!note) return;
+  noteEditorOrigin = document.querySelector('.screen.active')?.id || 'notes-screen';
   currentNoteId = noteId;
+  pendingLinkedDays = [...(note.linkedDays || [])];
   document.getElementById('note-title-input').value = note.title || '';
   document.getElementById('note-body-input').value = note.body || '';
   document.getElementById('note-edit-header').textContent = 'Edit Note';
+  renderNoteLinkedChips(noteId);
   showScreen('note-edit-screen');
+}
+
+function renderNoteLinkedChips(noteId) {
+  const chips = document.getElementById('note-linked-chips');
+  if (!chips) return;
+  chips.innerHTML = '';
+  if (pendingLinkedDays.length === 0) {
+    chips.innerHTML = '<span class="note-no-links">Not linked to any day</span>';
+    return;
+  }
+  pendingLinkedDays.forEach(dayId => {
+    const day = TRIP.days.find(d => d.id === dayId);
+    if (!day) return;
+    const chip = document.createElement('span');
+    chip.className = 'note-day-chip';
+    chip.innerHTML = `Day ${day.id} · ${day.title.split(' — ')[0]} <button onclick="unlinkNoteFromDayInEditor(${day.id})">✕</button>`;
+    chips.appendChild(chip);
+  });
+}
+
+function openNoteDayLinkerFromEditor() {
+  if (currentNoteId) openNoteDayLinker(currentNoteId);
+}
+
+function unlinkNoteFromDayInEditor(dayId) {
+  pendingLinkedDays = pendingLinkedDays.filter(id => id !== dayId);
+  renderNoteLinkedChips(currentNoteId);
+  // If note is already saved, also update Firebase
+  if (notesList[currentNoteId]) unlinkNoteFromDay(currentNoteId, dayId);
 }
 
 function saveCurrentNote() {
@@ -1046,18 +1240,21 @@ function saveCurrentNote() {
   const body = document.getElementById('note-body-input').value;
   if (!title && !body.trim()) { showToast('Nothing to save'); return; }
   const existing = notesList[currentNoteId];
-  tripRef.child(`notesList/${currentNoteId}`).set({
+  const note = {
     id: currentNoteId,
     title: title || 'Untitled',
     body,
     createdAt: existing?.createdAt || Date.now(),
     updatedAt: Date.now()
-  });
+  };
+  if (pendingLinkedDays.length) note.linkedDays = [...pendingLinkedDays];
+  tripRef.child(`notesList/${currentNoteId}`).set(note);
+  pendingLinkedDays = [];
   showToast('Note saved ✓');
-  showScreen('notes-screen');
+  showScreen(noteEditorOrigin || 'notes-screen');
 }
 
-function closeNoteEditor() { showScreen('notes-screen'); }
+function closeNoteEditor() { showScreen(noteEditorOrigin || 'notes-screen'); }
 
 function deleteNote(noteId) {
   const note = notesList[noteId];
@@ -1069,12 +1266,63 @@ function deleteNote(noteId) {
 function deleteCurrentNote() {
   if (!currentNoteId) { showScreen('notes-screen'); return; }
   if (!notesList[currentNoteId]) {
-    // Note was never saved — nothing to trash, just discard
     showScreen('notes-screen');
     return;
   }
   deleteNote(currentNoteId);
   showScreen('notes-screen');
+}
+
+function openNoteDayLinker(noteId) {
+  noteLinkModalNoteId = noteId;
+  modalRecId = null;
+
+  const note = notesList[noteId];
+  const titleEl = document.getElementById('note-title-input');
+  const displayTitle = note?.title || titleEl?.value.trim() || 'Untitled';
+  document.getElementById('modal-rec-name').textContent = displayTitle;
+  document.getElementById('modal-label').textContent = 'Link to which day?';
+
+  const modalDays = document.getElementById('modal-days');
+  modalDays.innerHTML = '';
+
+  TRIP.days.forEach(day => {
+    const isLinked = pendingLinkedDays.includes(day.id);
+    const btn = document.createElement('button');
+    btn.className = 'modal-day-btn';
+    if (isLinked) btn.style.opacity = '0.5';
+    btn.innerHTML = `
+      <span>${day.title}${isLinked ? ' ✓' : ''}</span>
+      <span class="modal-day-date">${day.date}</span>
+    `;
+    if (!isLinked) btn.onclick = () => linkNoteToDay(noteId, day.id);
+    modalDays.appendChild(btn);
+  });
+
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function linkNoteToDay(noteId, dayId) {
+  if (!pendingLinkedDays.includes(dayId)) pendingLinkedDays.push(dayId);
+  // If the note already exists in Firebase, persist immediately
+  if (notesList[noteId]) {
+    tripRef.child(`notesList/${noteId}/linkedDays`).set([...pendingLinkedDays]);
+  }
+  closeModal();
+  const day = TRIP.days.find(d => d.id === dayId);
+  showToast(`Linked to Day ${dayId}${day ? ' · ' + day.title.split(' ')[0] : ''} ✓`);
+  if (currentNoteId === noteId) renderNoteLinkedChips(noteId);
+}
+
+function unlinkNoteFromDay(noteId, dayId) {
+  const note = notesList[noteId];
+  if (!note) return;
+  const linkedDays = (note.linkedDays || []).filter(id => id !== dayId);
+  tripRef.child(`notesList/${noteId}/linkedDays`).set(linkedDays.length ? linkedDays : null);
+  showToast('Note unlinked');
+  const day = TRIP.days.find(d => d.id === dayId);
+  if (day) renderDayDetail(day);
+  if (currentNoteId === noteId) renderNoteLinkedChips(noteId);
 }
 
 // ===== STAR RATING =====
@@ -1116,6 +1364,92 @@ function showToast(message) {
   toast.classList.add('show');
   clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ===== ACTIVITY EDIT =====
+function openActivityEdit(dayId, activityId) {
+  const day = TRIP.days.find(d => d.id === dayId);
+  const act = day?.activities.find(a => a.id === activityId);
+  if (!act || !day) return;
+
+  editingActivity = { dayId, activityId };
+  const isNote = act.type === 'note';
+
+  const screen = document.getElementById('activity-edit-screen');
+  screen.classList.toggle('note-mode', isNote);
+
+  const recInfo = act.recId ? findRec(act.recId) : null;
+  const photo = recInfo?.rec?.photo || null;
+
+  const photoBg = document.getElementById('activity-edit-photo-bg');
+  const hero = document.getElementById('activity-edit-hero');
+  if (photo && !isNote) {
+    photoBg.style.backgroundImage = `url('${photo}')`;
+    hero.classList.add('has-photo');
+  } else {
+    photoBg.style.backgroundImage = '';
+    hero.classList.remove('has-photo');
+  }
+
+  document.getElementById('activity-edit-type-icon').textContent = typeIcon(act.type);
+  document.getElementById('activity-edit-day-info').textContent = `${day.date} · ${day.title}`;
+
+  const recRow = document.getElementById('activity-edit-rec-row');
+  const starsEl = document.getElementById('activity-edit-stars');
+  const mapsEl = document.getElementById('activity-edit-maps');
+  const rating = recInfo?.rec?.rating || null;
+  starsEl.innerHTML = rating ? renderStars(rating) : '';
+  if (act.mapsUrl && !isNote) { mapsEl.href = act.mapsUrl; mapsEl.style.display = 'inline'; } else { mapsEl.style.display = 'none'; }
+  recRow.style.display = (!isNote && (rating || act.mapsUrl)) ? 'flex' : 'none';
+
+  document.getElementById('activity-edit-title').value = isNote && act.name === 'Note' ? '' : act.name;
+  document.getElementById('activity-edit-title').placeholder = isNote ? 'Title (optional)' : 'Activity name';
+  document.getElementById('activity-edit-detail').value = act.detail || '';
+  document.getElementById('activity-edit-detail').placeholder = isNote ? 'Write your note here…' : 'Add a note...';
+  document.getElementById('activity-edit-time').value = act.time || '';
+
+  showScreen('activity-edit-screen');
+}
+
+function closeActivityEdit() {
+  showScreen('day-detail-screen');
+}
+
+function deleteCurrentActivity() {
+  if (!editingActivity) return;
+  const { dayId, activityId } = editingActivity;
+  editingActivity = null;
+  deleteActivity(dayId, activityId);
+  showScreen('day-detail-screen');
+}
+
+function saveActivityEdit() {
+  if (!editingActivity) return;
+  const { dayId, activityId } = editingActivity;
+  const day = TRIP.days.find(d => d.id === dayId);
+  const act = day?.activities.find(a => a.id === activityId);
+  if (!act || !day) return;
+
+  const title = document.getElementById('activity-edit-title').value.trim();
+  const detail = document.getElementById('activity-edit-detail').value;
+  const time = document.getElementById('activity-edit-time').value;
+
+  if (!title) { showToast('Title cannot be empty'); return; }
+
+  act.name = title;
+  act.detail = detail;
+  if (time) {
+    act.time = time;
+    sortActivitiesByTime(day);
+  } else {
+    delete act.time;
+  }
+
+  saveDayState();
+  showToast('Saved ✓');
+  editingActivity = null;
+  showScreen('day-detail-screen');
+  renderDayDetail(day);
 }
 
 // ===== TIME & SORT =====
@@ -1161,13 +1495,9 @@ function initDragDrop(listEl, day) {
     const item = e.target.closest('.activity-item');
     if (!item || e.target.closest('button, a, input, select')) return;
 
-    const sx = e.clientX, sy = e.clientY, pid = e.pointerId;
+    const sx = e.clientX, sy = e.clientY;
 
     pressTimer = setTimeout(() => {
-      const actItems = [...listEl.querySelectorAll('.activity-item')];
-      const actIdx = actItems.indexOf(item);
-      if (actIdx === -1) return;
-
       const rect = item.getBoundingClientRect();
       const ghost = item.cloneNode(true);
       ghost.className = 'activity-item drag-ghost';
@@ -1183,24 +1513,27 @@ function initDragDrop(listEl, day) {
       item.after(ph);
       item.classList.add('is-dragging');
 
-      try { item.setPointerCapture(pid); } catch(_) {}
-      active = { el: item, actIdx, ghost, ph, offsetY: e.clientY - rect.top };
+      active = { el: item, ghost, ph, offsetY: e.clientY - rect.top };
+
+      document.addEventListener('pointermove', onDragMove, { passive: false });
+      document.addEventListener('pointerup', onDragEnd);
+      document.addEventListener('pointercancel', onDragCancel);
     }, 450);
 
-    const cancelOnMove = ev => {
-      if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) > 8) {
+    const cancelTimer = ev => {
+      if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) > 10) {
         clearTimeout(pressTimer); pressTimer = null;
-        listEl.removeEventListener('pointermove', cancelOnMove);
+        document.removeEventListener('pointermove', cancelTimer);
       }
     };
-    listEl.addEventListener('pointermove', cancelOnMove);
-    listEl.addEventListener('pointerup', () => {
+    document.addEventListener('pointermove', cancelTimer);
+    document.addEventListener('pointerup', () => {
       clearTimeout(pressTimer); pressTimer = null;
-      listEl.removeEventListener('pointermove', cancelOnMove);
+      document.removeEventListener('pointermove', cancelTimer);
     }, { once: true });
   });
 
-  listEl.addEventListener('pointermove', e => {
+  function onDragMove(e) {
     if (!active) return;
     e.preventDefault();
     const { ghost, ph, el, offsetY } = active;
@@ -1213,42 +1546,289 @@ function initDragDrop(listEl, day) {
       if (e.clientY < r.top + r.height / 2) { it.before(ph); placed = true; break; }
     }
     if (!placed) listEl.appendChild(ph);
-  }, { passive: false });
+  }
 
-  const finish = () => {
+  function onDragEnd() {
     if (!active) return;
-    const { el, actIdx, ghost, ph } = active;
+    const { el, ghost, ph } = active;
+    const draggedId = parseInt(el.dataset.activityId);
     active = null;
 
-    let newIdx = 0, counted = 0;
+    document.removeEventListener('pointermove', onDragMove);
+    document.removeEventListener('pointerup', onDragEnd);
+    document.removeEventListener('pointercancel', onDragCancel);
+
+    let newPlanPos = 0;
     for (const child of listEl.children) {
-      if (child === ph) { newIdx = counted; break; }
-      if (child.classList.contains('activity-item') && child !== el) counted++;
+      if (child === ph) break;
+      if (child.classList.contains('activity-item') && child !== el) newPlanPos++;
     }
 
     ghost.remove(); ph.remove();
     el.classList.remove('is-dragging');
 
-    if (newIdx !== actIdx) {
-      const moved = day.activities.splice(actIdx, 1)[0];
-      day.activities.splice(newIdx, 0, moved);
-      applyDragTimeRule(day, newIdx);
+    const planActivities = day.activities.filter(a => a.type !== 'note');
+    const currentPlanPos = planActivities.findIndex(a => a.id === draggedId);
+
+    if (newPlanPos !== currentPlanPos) {
+      const newPlanOrder = [...planActivities];
+      const [moved] = newPlanOrder.splice(currentPlanPos, 1);
+      newPlanOrder.splice(newPlanPos, 0, moved);
+      const noteActivities = day.activities.filter(a => a.type === 'note');
+      day.activities = [...newPlanOrder, ...noteActivities];
+      applyDragTimeRule(day, newPlanPos);
       saveDayState();
       renderDayDetail(day);
       renderItinerary();
     }
-  };
+  }
 
-  const cancel = () => {
+  function onDragCancel() {
     if (!active) return;
     const { el, ghost, ph } = active;
     active = null;
+    document.removeEventListener('pointermove', onDragMove);
+    document.removeEventListener('pointerup', onDragEnd);
+    document.removeEventListener('pointercancel', onDragCancel);
     ghost.remove(); ph.remove();
     el.classList.remove('is-dragging');
-  };
+  }
+}
 
-  listEl.addEventListener('pointerup', finish);
-  listEl.addEventListener('pointercancel', cancel);
+// ===== JOURNAL =====
+function renderJournalSection(day) {
+  const section = document.getElementById('day-journal-section');
+  if (!section) return;
+  const journal = journalEntries[day.id];
+  section.innerHTML = '';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'day-journal-section-inner';
+
+  const labelRow = document.createElement('div');
+  labelRow.className = 'day-journal-header';
+  labelRow.innerHTML = `<p class="section-label" style="padding:0">Memory</p>`;
+  wrapper.appendChild(labelRow);
+
+  if (journal) {
+    const preview = document.createElement('div');
+    preview.className = 'day-journal-preview';
+    preview.onclick = () => openJournalEditor(day.id);
+    preview.innerHTML = `
+      ${journal.photo ? `<div class="day-journal-photo" style="background-image:url('${journal.photo}')"></div>` : ''}
+      ${journal.text ? `<p class="day-journal-text">${journal.text.substring(0, 160)}${journal.text.length > 160 ? '…' : ''}</p>` : ''}
+      <span class="day-journal-edit-hint">Tap to edit ◈</span>
+    `;
+    wrapper.appendChild(preview);
+  } else {
+    const addBtn = document.createElement('button');
+    addBtn.className = 'day-journal-add-btn';
+    addBtn.innerHTML = `<span>◈</span> Add a memory for this day`;
+    addBtn.onclick = () => openJournalEditor(day.id);
+    wrapper.appendChild(addBtn);
+  }
+
+  section.appendChild(wrapper);
+}
+
+let journalEditorOrigin = 'day-detail-screen';
+
+function openJournalEditor(dayId) {
+  journalEditorOrigin = document.querySelector('.screen.active')?.id || 'day-detail-screen';
+  currentJournalDayId = dayId;
+  journalTempPhoto = null;
+  const day = TRIP.days.find(d => d.id === dayId);
+  document.getElementById('journal-edit-header').textContent = day ? `${day.title} · ${day.date}` : 'Our Day';
+  const journal = journalEntries[dayId];
+  document.getElementById('journal-text-input').value = journal?.text || '';
+  const photoBg = document.getElementById('journal-photo-bg');
+  const btnLabel = document.getElementById('journal-photo-btn-label');
+  if (journal?.photo) {
+    photoBg.style.backgroundImage = `url('${journal.photo}')`;
+    journalTempPhoto = journal.photo;
+    btnLabel.textContent = 'Change photo';
+    document.getElementById('journal-photo-remove-btn').style.display = 'flex';
+  } else {
+    photoBg.style.backgroundImage = '';
+    btnLabel.textContent = 'Add a photo';
+    document.getElementById('journal-photo-remove-btn').style.display = 'none';
+  }
+  showScreen('journal-edit-screen');
+}
+
+function removeJournalPhoto() {
+  journalTempPhoto = null;
+  document.getElementById('journal-photo-bg').style.backgroundImage = '';
+  document.getElementById('journal-photo-btn-label').textContent = 'Add a photo';
+  document.getElementById('journal-photo-remove-btn').style.display = 'none';
+}
+
+function closeJournalEditor() {
+  showScreen(journalEditorOrigin || 'day-detail-screen');
+}
+
+function compressPhoto(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const maxW = 1200, maxH = 1200;
+        let w = img.width, h = img.height;
+        if (w > maxW || h > maxH) {
+          const ratio = Math.min(maxW / w, maxH / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.70));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleJournalPhoto(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const btnLabel = document.getElementById('journal-photo-btn-label');
+  btnLabel.textContent = 'Processing…';
+  try {
+    const base64 = await compressPhoto(file);
+    journalTempPhoto = base64;
+    document.getElementById('journal-photo-bg').style.backgroundImage = `url('${base64}')`;
+    btnLabel.textContent = 'Change photo';
+    document.getElementById('journal-photo-remove-btn').style.display = 'flex';
+    showToast('Photo ready ✓');
+  } catch(e) {
+    btnLabel.textContent = 'Add a photo';
+    showToast('Could not load photo');
+  }
+  input.value = '';
+}
+
+function saveJournalEntry() {
+  if (!currentJournalDayId) return;
+  const text = document.getElementById('journal-text-input').value.trim();
+  if (!text && !journalTempPhoto) {
+    delete journalEntries[currentJournalDayId];
+    tripRef.child(`journal/${currentJournalDayId}`).remove();
+    showToast('Memory removed');
+    closeJournalEditor();
+    return;
+  }
+  const entry = { dayId: currentJournalDayId, updatedAt: Date.now() };
+  if (text) entry.text = text;
+  if (journalTempPhoto) entry.photo = journalTempPhoto;
+  journalEntries[currentJournalDayId] = entry;
+  tripRef.child(`journal/${currentJournalDayId}`).set(entry);
+  showToast('Memory saved ♡');
+  closeJournalEditor();
+}
+
+// ===== HIGHLIGHTS =====
+function renderHighlights() {
+  const content = document.getElementById('highlights-content');
+  if (!content) return;
+  content.innerHTML = '';
+
+  const allRecs = [...(RECOMMENDATIONS.rome || []), ...(RECOMMENDATIONS.florence || []), ...customRecs];
+  const likedPlaces = allRecs.filter(r => likedRecs.has(r.id));
+
+  let hasAnything = false;
+
+  // Days in chronological order
+  TRIP.days.forEach(day => {
+    const journal = journalEntries[day.id];
+    const likedActivities = day.activities.filter(a => a.liked && a.type !== 'note');
+    if (!journal && likedActivities.length === 0) return;
+
+    hasAnything = true;
+
+    // Day section header
+    const dayHeader = document.createElement('div');
+    dayHeader.className = 'highlights-day-header';
+    dayHeader.innerHTML = `
+      <span class="highlights-day-number">Day ${day.id}</span>
+      <span class="highlights-day-title">${day.title}</span>
+      <span class="highlights-day-date">${day.date}</span>
+    `;
+    content.appendChild(dayHeader);
+
+    // Memory
+    if (journal) {
+      const item = document.createElement('div');
+      item.className = 'highlights-memory-card';
+      item.onclick = () => openJournalEditor(day.id);
+      item.innerHTML = `
+        ${journal.photo
+          ? `<div class="highlights-memory-photo" style="background-image:url('${journal.photo}')">
+               <div class="highlights-memory-overlay">
+                 <span class="highlights-memory-heart">♡</span>
+                 <span class="highlights-memory-label">Memory</span>
+               </div>
+             </div>`
+          : `<div class="highlights-memory-header">
+               <span class="highlights-memory-heart">♡</span>
+               <span class="highlights-memory-label">Memory</span>
+             </div>`
+        }
+        ${journal.text ? `<div class="highlights-memory-text">${journal.text}</div>` : ''}
+      `;
+      content.appendChild(item);
+    }
+
+    // Liked activities
+    likedActivities.forEach(activity => {
+      const recInfo = activity.recId ? findRec(activity.recId) : null;
+      const photo = recInfo?.rec?.photo;
+      const item = document.createElement('div');
+      item.className = 'highlights-item';
+      item.onclick = () => openDay(day.id);
+      item.innerHTML = `
+        ${photo ? `<div class="highlights-photo" style="background-image:url('${photo}')"></div>` : ''}
+        <div class="highlights-body">
+          <span class="highlights-day-tag">♡ Favourite</span>
+          <div class="highlights-name">${activity.name}</div>
+          ${activity.detail ? `<div class="highlights-detail">${activity.detail}</div>` : ''}
+        </div>
+      `;
+      content.appendChild(item);
+    });
+  });
+
+  // Saved places
+  if (likedPlaces.length > 0) {
+    hasAnything = true;
+    const label = document.createElement('div');
+    label.className = 'highlights-day-header';
+    label.innerHTML = `<span class="highlights-day-title">Saved places</span>`;
+    content.appendChild(label);
+
+    likedPlaces.forEach(rec => {
+      const item = document.createElement('div');
+      item.className = 'highlights-item';
+      item.innerHTML = `
+        ${rec.photo ? `<div class="highlights-photo" style="background-image:url('${rec.photo}')"></div>` : ''}
+        <div class="highlights-body">
+          <span class="highlights-day-tag">${rec.city ? rec.city.charAt(0).toUpperCase() + rec.city.slice(1) : ''} · ${rec.category}</span>
+          <div class="highlights-name">${rec.name}</div>
+          ${rec.detail ? `<div class="highlights-detail">${rec.detail}</div>` : ''}
+          ${rec.mapsUrl ? `<a href="${rec.mapsUrl}" target="_blank" class="activity-maps-link" onclick="event.stopPropagation()">View on Maps ↗</a>` : ''}
+        </div>
+      `;
+      content.appendChild(item);
+    });
+  }
+
+  if (!hasAnything) {
+    content.innerHTML = `<div class="empty-state" style="padding:60px 20px"><div class="empty-state-icon">♡</div><div class="empty-state-text">Nothing here yet — add memories and tap ♡ on favourite moments</div></div>`;
+  }
 }
 
 // ===== INIT =====
