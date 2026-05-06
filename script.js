@@ -1127,13 +1127,16 @@ function parseMapsUrl(url) {
 // ===== ADD CUSTOM ACTIVITY =====
 function onActivityTypeChange(select) {
   const noteArea = document.getElementById('new-activity-note');
+  const mapsInput = document.getElementById('new-activity-maps');
   const input = document.getElementById('new-activity-input');
   if (select.value === 'note') {
     noteArea.style.display = 'block';
+    if (mapsInput) mapsInput.style.display = 'none';
     input.placeholder = 'Note title (optional)';
   } else {
     noteArea.style.display = 'none';
     noteArea.value = '';
+    if (mapsInput) mapsInput.style.display = 'block';
     input.placeholder = 'e.g. Dinner somewhere special';
   }
 }
@@ -1142,9 +1145,11 @@ function addActivity() {
   const input = document.getElementById('new-activity-input');
   const typeSelect = document.getElementById('new-activity-type');
   const noteArea = document.getElementById('new-activity-note');
+  const mapsInput = document.getElementById('new-activity-maps');
   const raw = input.value.trim();
   const isNote = typeSelect.value === 'note';
   const noteBody = noteArea ? noteArea.value.trim() : '';
+  const mapsRaw = mapsInput ? mapsInput.value.trim() : '';
 
   if (!raw && !noteBody) { showToast('Please type something first'); return; }
 
@@ -1152,10 +1157,11 @@ function addActivity() {
   if (!day) return;
 
   let name = raw || 'Note';
-  let mapsUrl = null;
+  let mapsUrl = mapsRaw || null;
   let detail = isNote ? noteBody : '';
 
-  if (!isNote && (raw.includes('google.com/maps') || raw.includes('maps.google.com') || raw.includes('goo.gl/maps'))) {
+  // Legacy: if name field itself is a Maps URL, treat it as such
+  if (!mapsUrl && !isNote && (raw.includes('google.com/maps') || raw.includes('maps.google.com') || raw.includes('maps.app.goo.gl') || raw.includes('goo.gl/maps'))) {
     const extracted = parseMapsUrl(raw);
     name = extracted || 'Place from Maps';
     mapsUrl = raw;
@@ -1164,12 +1170,13 @@ function addActivity() {
   day.activities.push({ id: nextActivityId++, type: typeSelect.value, name, detail, mapsUrl, liked: false });
   input.value = '';
   if (noteArea) { noteArea.value = ''; noteArea.style.display = 'none'; }
+  if (mapsInput) { mapsInput.value = ''; mapsInput.style.display = 'none'; }
   input.placeholder = 'e.g. Dinner somewhere special';
   typeSelect.value = 'activity';
   saveDayState();
   renderDayDetail(day);
   renderItinerary();
-  showToast(mapsUrl ? `"${name}" added from Maps ✓` : 'Added ✓');
+  showToast(mapsUrl ? `"${name}" added ✓` : 'Added ✓');
 }
 
 // ===== TOGGLE LIKE (itinerary item) =====
@@ -2089,10 +2096,12 @@ function handleBackNavigation() {
 // ===== MAP =====
 function extractLatLng(url) {
   if (!url) return null;
+  // @lat,lng — standard place/search URL (most common, copy from browser bar)
   const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
   if (atMatch) return [parseFloat(atMatch[1]), parseFloat(atMatch[2])];
-  const qMatch = url.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if (qMatch) return [parseFloat(qMatch[1]), parseFloat(qMatch[2])];
+  // ?q=lat,lng or &ll=lat,lng or &query=lat,lng or &daddr=lat,lng
+  const paramMatch = url.match(/[?&](?:q|ll|query|daddr|center|cbll)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (paramMatch) return [parseFloat(paramMatch[1]), parseFloat(paramMatch[2])];
   return null;
 }
 
