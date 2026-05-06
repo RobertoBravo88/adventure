@@ -405,6 +405,7 @@ let noteEditorOrigin = 'notes-screen';
 let mapCity = 'rome';
 let leafletMap = null;
 let mapMarkers = [];
+let mapFilter = new Set(['7','8','9','10','11','12','discover','hotel']);
 
 // ===== FIREBASE =====
 firebase.initializeApp({
@@ -2144,12 +2145,14 @@ async function resolveShortMapUrl(url) {
   return url; // return original if resolution fails
 }
 
-function getRecDayColor(recId) {
+function getRecDayKey(recId) {
   const days = addedRecs[recId];
-  if (days && days.length > 0) {
-    return DAY_COLORS[days[0]] || DISCOVER_COLOR;
-  }
-  return DISCOVER_COLOR;
+  return (days && days.length > 0) ? String(days[0]) : 'discover';
+}
+
+function getRecDayColor(recId) {
+  const key = getRecDayKey(recId);
+  return DAY_COLORS[parseInt(key)] || DISCOVER_COLOR;
 }
 
 function makeMarkerIcon(color) {
@@ -2203,45 +2206,96 @@ function setMapCity(city, tabEl) {
 }
 
 function renderMapMarkers(city) {
-  mapMarkers.forEach(m => m.remove());
+  mapMarkers.forEach(m => leafletMap.removeLayer(m.marker));
   mapMarkers = [];
+  leafletMap.off('zoomend', onMapZoom);
 
   const recs = getAllRecs(city);
   recs.forEach(rec => {
     const coords = REC_COORDS[rec.id] || extractLatLng(rec.mapsUrl);
     if (!coords) return;
-    const color = getRecDayColor(rec.id);
-    const marker = L.marker(coords, { icon: makeMarkerIcon(color) }).addTo(leafletMap);
+    const dayKey = getRecDayKey(rec.id);
+    const color = DAY_COLORS[parseInt(dayKey)] || DISCOVER_COLOR;
+    const marker = L.marker(coords, { icon: makeMarkerIcon(color) });
+    if (mapFilter.has(dayKey)) marker.addTo(leafletMap);
+    marker.bindTooltip(rec.name, { permanent: true, direction: 'right', className: 'map-label', offset: [9, 0] });
     marker.on('click', () => showMapPopup(rec.id));
-    mapMarkers.push(marker);
+    mapMarkers.push({ marker, dayKey, visible: mapFilter.has(dayKey) });
   });
 
   (MAP_HOTELS[city] || []).forEach(hotel => {
-    const marker = L.marker(hotel.latlng, { icon: makeHotelIcon() }).addTo(leafletMap);
+    const marker = L.marker(hotel.latlng, { icon: makeHotelIcon() });
+    if (mapFilter.has('hotel')) marker.addTo(leafletMap);
+    marker.bindTooltip(hotel.name, { permanent: true, direction: 'right', className: 'map-label', offset: [11, 0] });
     marker.on('click', () => showHotelPopup(hotel));
-    mapMarkers.push(marker);
+    mapMarkers.push({ marker, dayKey: 'hotel', visible: mapFilter.has('hotel') });
   });
 
+  updateMapLabels();
+  leafletMap.on('zoomend', onMapZoom);
   renderMapLegend(city);
 }
 
+function onMapZoom() { updateMapLabels(); }
+
+function updateMapLabels() {
+  if (!leafletMap) return;
+  const show = leafletMap.getZoom() >= 15;
+  mapMarkers.forEach(m => {
+    if (!m.visible) return;
+    try { show ? m.marker.openTooltip() : m.marker.closeTooltip(); } catch(e) {}
+  });
+}
+
+function toggleMapFilter(dayKey) {
+  if (mapFilter.has(dayKey)) {
+    mapFilter.delete(dayKey);
+    mapMarkers.filter(m => m.dayKey === dayKey).forEach(m => {
+      leafletMap.removeLayer(m.marker);
+      m.visible = false;
+    });
+  } else {
+    mapFilter.add(dayKey);
+    const showLabels = leafletMap.getZoom() >= 15;
+    mapMarkers.filter(m => m.dayKey === dayKey).forEach(m => {
+      m.marker.addTo(leafletMap);
+      m.visible = true;
+      if (!showLabels) m.marker.closeTooltip();
+    });
+  }
+  document.querySelectorAll('#map-legend-panel .map-legend-item').forEach(el => {
+    el.classList.toggle('map-legend-inactive', !mapFilter.has(el.dataset.dayKey));
+  });
+}
+
 function renderMapLegend(city) {
-  const el = document.getElementById('map-legend');
-  if (!el) return;
-  const cityDayIds = city === 'rome' ? [7, 8, 9] : [10, 11, 12];
-  const usedDays = cityDayIds.filter(id => {
-    const recs = getAllRecs(city);
-    return recs.some(rec => (addedRecs[rec.id] || []).includes(id));
+  const existing = document.getElementById('map-legend-panel');
+  if (existing) existing.remove();
+
+  const panel = document.createElement('div');
+  panel.id = 'map-legend-panel';
+  panel.className = 'map-legend-panel';
+
+  const dayIds = city === 'rome' ? ['7','8','9'] : ['10','11','12'];
+  const items = [
+    ...dayIds.map(id => {
+      const day = TRIP.days.find(d => d.id === parseInt(id));
+      return { key: id, label: `Day ${id} · ${day ? day.date.split(',')[1].trim() : ''}`, dot: `background:${DAY_COLORS[parseInt(id)]}` };
+    }),
+    { key: 'discover', label: 'Discover', dot: `background:${DISCOVER_COLOR}` },
+    { key: 'hotel',    label: 'Hotel',    dot: `background:#F2E8D5;border:1.5px solid #9B1D35;border-radius:2px` },
+  ];
+
+  items.forEach(({ key, label, dot }) => {
+    const item = document.createElement('div');
+    item.className = 'map-legend-item' + (mapFilter.has(key) ? '' : ' map-legend-inactive');
+    item.dataset.dayKey = key;
+    item.onclick = () => toggleMapFilter(key);
+    item.innerHTML = `<div class="map-legend-dot" style="${dot}"></div><span>${label}</span>`;
+    panel.appendChild(item);
   });
 
-  let html = '';
-  usedDays.forEach(id => {
-    const day = TRIP.days.find(d => d.id === id);
-    html += `<div class="map-legend-item"><div class="map-legend-dot" style="background:${DAY_COLORS[id]}"></div><span>Day ${id} · ${day ? day.date.split(',')[1].trim() : ''}</span></div>`;
-  });
-  html += `<div class="map-legend-item"><div class="map-legend-dot" style="background:${DISCOVER_COLOR}"></div><span>Not planned</span></div>`;
-  html += `<div class="map-legend-item"><div class="map-legend-dot" style="background:#F2E8D5;border:1.5px solid #9B1D35;border-radius:2px"></div><span>Hotel</span></div>`;
-  el.innerHTML = html;
+  document.getElementById('map-container').appendChild(panel);
 }
 
 function showHotelPopup(hotel) {
