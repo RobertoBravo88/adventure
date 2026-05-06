@@ -363,6 +363,16 @@ const DAY_COLORS = {
   12: '#C85DE8',
 };
 const DISCOVER_COLOR = '#C9A84C';
+const HOTEL_COLOR = '#F2E8D5';
+
+const MAP_HOTELS = {
+  rome: [
+    { name: 'The Social Hub Rome', detail: 'Viale dello Scalo San Lorenzo, 10, 00185 · Check-in from 15:00 · Check-out by 12:00', latlng: [41.8956, 12.5057], mapsUrl: 'https://www.google.com/maps/search/The+Social+Hub+Rome+Viale+dello+Scalo+San+Lorenzo' },
+  ],
+  florence: [
+    { name: 'Hotel Palazzo Borghini', detail: 'Via Vincenzo Borghini, 23, 50133 Florence · Check-in from 15:00 · Check-out 07:00–11:00', latlng: [43.7827, 11.2622], mapsUrl: 'https://www.google.com/maps/search/Hotel+Palazzo+Borghini+Florence+Via+Vincenzo+Borghini' },
+  ],
+};
 
 const CITY_CENTERS = {
   rome:     { latlng: [41.9009, 12.4783], zoom: 14 },
@@ -2095,6 +2105,16 @@ function makeMarkerIcon(color) {
   });
 }
 
+function makeHotelIcon() {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:18px;height:18px;border-radius:3px;background:#F2E8D5;border:2px solid #9B1D35;box-shadow:0 2px 6px rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#150810;line-height:1">H</div>`,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+    popupAnchor: [0, -12],
+  });
+}
+
 function showMapScreen() {
   const container = document.getElementById('map-container');
   if (!leafletMap) {
@@ -2136,6 +2156,12 @@ function renderMapMarkers(city) {
     mapMarkers.push(marker);
   });
 
+  (MAP_HOTELS[city] || []).forEach(hotel => {
+    const marker = L.marker(hotel.latlng, { icon: makeHotelIcon() }).addTo(leafletMap);
+    marker.on('click', () => showHotelPopup(hotel));
+    mapMarkers.push(marker);
+  });
+
   renderMapLegend(city);
 }
 
@@ -2154,7 +2180,28 @@ function renderMapLegend(city) {
     html += `<div class="map-legend-item"><div class="map-legend-dot" style="background:${DAY_COLORS[id]}"></div><span>Day ${id} · ${day ? day.date.split(',')[1].trim() : ''}</span></div>`;
   });
   html += `<div class="map-legend-item"><div class="map-legend-dot" style="background:${DISCOVER_COLOR}"></div><span>Not planned</span></div>`;
+  html += `<div class="map-legend-item"><div class="map-legend-dot" style="background:#F2E8D5;border:1.5px solid #9B1D35;border-radius:2px"></div><span>Hotel</span></div>`;
   el.innerHTML = html;
+}
+
+function showHotelPopup(hotel) {
+  const popup = document.getElementById('map-popup');
+  const body = document.getElementById('map-popup-body');
+
+  body.innerHTML = `
+    <div class="map-popup-header">
+      <div class="map-popup-dot" style="background:#F2E8D5;border-color:#9B1D35;border-radius:2px"></div>
+      <div class="map-popup-title">${hotel.name}</div>
+      <button class="map-popup-close" onclick="closeMapPopup()">✕</button>
+    </div>
+    <div class="map-popup-cat">◇ Hotel</div>
+    <div class="map-popup-detail">${hotel.detail}</div>
+    <div class="map-popup-actions">
+      ${hotel.mapsUrl ? `<a href="${hotel.mapsUrl}" target="_blank" class="map-popup-maps-btn" style="flex:1">Maps ↗</a>` : ''}
+    </div>
+  `;
+
+  popup.style.display = 'block';
 }
 
 function showMapPopup(recId) {
