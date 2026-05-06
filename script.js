@@ -1016,16 +1016,12 @@ function openAddToDay(recId) {
   relevantDays.forEach(day => {
     const isAdded = (addedRecs[recId] || []).includes(day.id);
     const btn = document.createElement('button');
-    btn.className = 'modal-day-btn';
-    btn.disabled = isAdded;
-    btn.style.opacity = isAdded ? '0.5' : '1';
+    btn.className = 'modal-day-btn' + (isAdded ? ' modal-day-btn-added' : '');
     btn.innerHTML = `
       <span>${day.title} ${isAdded ? '✓' : ''}</span>
-      <span class="modal-day-date">${day.date}</span>
+      <span class="modal-day-date">${isAdded ? 'Tap to remove' : day.date}</span>
     `;
-    if (!isAdded) {
-      btn.onclick = () => addRecFromModal(recId, day.id, rec);
-    }
+    btn.onclick = () => isAdded ? removeRecFromDay(recId, day.id) : addRecFromModal(recId, day.id, rec);
     modalDays.appendChild(btn);
   });
 
@@ -1058,6 +1054,22 @@ function addRecFromModal(recId, dayId, rec) {
   closeModal();
   renderDiscoverList();
   showToast(`Added to Day ${day.id} ✓`);
+}
+
+function removeRecFromDay(recId, dayId) {
+  const day = TRIP.days.find(d => d.id === dayId);
+  if (!day) return;
+  day.activities = day.activities.filter(a => a.recId !== recId);
+  if (addedRecs[recId]) {
+    addedRecs[recId] = addedRecs[recId].filter(id => id !== dayId);
+    if (addedRecs[recId].length === 0) delete addedRecs[recId];
+  }
+  saveAddedRecs();
+  saveDayState();
+  closeModal();
+  refreshCurrentScreen();
+  if (document.getElementById('map-screen')?.classList.contains('active')) renderMapMarkers(mapCity);
+  showToast(`Removed from Day ${dayId}`);
 }
 
 function closeModal() {

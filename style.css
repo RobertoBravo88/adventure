@@ -1482,6 +1482,8 @@ html, body {
 }
 
 .modal-day-btn:hover { border-color: var(--gold); background: var(--surface-2); }
+.modal-day-btn-added { border-color: var(--accent); color: var(--ink-2); }
+.modal-day-btn-added:hover { border-color: var(--accent-dark); background: rgba(155,29,53,0.12); }
 .modal-day-date { font-size: 11px; color: var(--ink-3); }
 
 /* ===== TOAST ===== */
