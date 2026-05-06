@@ -317,6 +317,58 @@ const RECOMMENDATIONS = {
   ]
 };
 
+// ===== MAP COORDINATES =====
+const REC_COORDS = {
+  // Rome
+  r1:  [41.8902, 12.4922],
+  r2:  [41.8986, 12.4769],
+  r3:  [41.9065, 12.4535],
+  r4:  [41.9022, 12.4539],
+  r5:  [41.9009, 12.4833],
+  r6:  [41.9143, 12.4922],
+  r7:  [41.9031, 12.4663],
+  r8:  [41.8876, 12.4706],
+  r9:  [41.8885, 12.4702],
+  r10: [41.8897, 12.4694],
+  r11: [41.8954, 12.4723],
+  r12: [41.8893, 12.4698],
+  r13: [41.8924, 12.4614],
+  r14: [41.8990, 12.4775],
+  r15: [41.8937, 12.4795],
+  r16: [41.9027, 12.4660],
+  // Florence
+  f1:  [43.7677, 11.2553],
+  f2:  [43.7733, 11.2560],
+  f3:  [43.7766, 11.2586],
+  f4:  [43.7647, 11.2499],
+  f5:  [43.7694, 11.2558],
+  f6:  [43.7706, 11.2481],
+  f7:  [43.7763, 11.2531],
+  f8:  [43.7680, 11.2577],
+  f9:  [43.7655, 11.2492],
+  f10: [43.7759, 11.2527],
+  f11: [43.7629, 11.2652],
+  f12: [43.7680, 11.2531],
+  f13: [43.8072, 11.2938],
+  f14: [43.7650, 11.2488],
+  f15: [43.7683, 11.2502],
+};
+
+const DAY_COLORS = {
+  7:  '#E8725D',
+  8:  '#E8C05D',
+  9:  '#6EB5E8',
+  10: '#5DE8C0',
+  11: '#88E85D',
+  12: '#C85DE8',
+};
+const DISCOVER_COLOR = '#C9A84C';
+
+const CITY_CENTERS = {
+  rome:     { latlng: [41.9009, 12.4783], zoom: 14 },
+  florence: { latlng: [43.7696, 11.2558], zoom: 15 },
+};
+
 // ===== STATE =====
 let currentDayId = null;
 let nextActivityId = 200;
@@ -340,6 +392,9 @@ let journalEntries = {};
 let currentJournalDayId = null;
 let journalTempPhoto = null;
 let noteEditorOrigin = 'notes-screen';
+let mapCity = 'rome';
+let leafletMap = null;
+let mapMarkers = [];
 
 // ===== FIREBASE =====
 firebase.initializeApp({
@@ -389,6 +444,7 @@ function refreshCurrentScreen() {
   if (id === 'discover-screen') renderDiscoverScreen();
   if (id === 'notes-screen') renderNotesList();
   if (id === 'trash-screen') renderTrashScreen();
+  if (id === 'map-screen' && leafletMap) renderMapMarkers(mapCity);
   if (id === 'day-detail-screen') {
     const day = TRIP.days.find(d => d.id === currentDayId);
     if (day) renderDayDetail(day);
@@ -452,10 +508,14 @@ function showScreen(screenId) {
   if (screenId === 'notes-screen') renderNotesList();
   if (screenId === 'trash-screen') renderTrashScreen();
   if (screenId === 'highlights-screen') renderHighlights();
+  if (screenId === 'map-screen') showMapScreen();
   if (screenId === 'day-detail-screen' && currentDayId) {
     const day = TRIP.days.find(d => d.id === currentDayId);
     if (day) renderDayDetail(day);
   }
+
+  // Close map popup when leaving map screen
+  if (screenId !== 'map-screen') closeMapPopup();
 
   // Sync nav active state
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -465,6 +525,7 @@ function showScreen(screenId) {
     'discover-screen': 'Discover',
     'transport-screen': 'Transport',
     'notes-screen': 'Notes',
+    'map-screen': 'Map',
   };
   const label = map[screenId];
   if (label) {
@@ -2006,12 +2067,133 @@ function handleBackNavigation() {
     case 'notes-screen':          showScreen('itinerary-screen'); break;
     case 'highlights-screen':     showScreen('itinerary-screen'); break;
     case 'trash-screen':          showScreen('itinerary-screen'); break;
+    case 'map-screen':            showScreen('itinerary-screen'); break;
     case 'note-edit-screen':      closeNoteEditor(); break;
     case 'activity-edit-screen':  closeActivityEdit(); break;
     case 'journal-edit-screen':   closeJournalEditor(); break;
     case 'install-screen':        skipInstall(); break;
     // password-screen / welcome-screen: let the OS handle it (exit app)
   }
+}
+
+// ===== MAP =====
+function getRecDayColor(recId) {
+  const days = addedRecs[recId];
+  if (days && days.length > 0) {
+    return DAY_COLORS[days[0]] || DISCOVER_COLOR;
+  }
+  return DISCOVER_COLOR;
+}
+
+function makeMarkerIcon(color) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.85);box-shadow:0 2px 6px rgba(0,0,0,0.6)"></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -10],
+  });
+}
+
+function showMapScreen() {
+  const container = document.getElementById('map-container');
+  if (!leafletMap) {
+    leafletMap = L.map(container, { zoomControl: false, attributionControl: false })
+      .setView(CITY_CENTERS[mapCity].latlng, CITY_CENTERS[mapCity].zoom);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+    }).addTo(leafletMap);
+    L.control.zoom({ position: 'topright' }).addTo(leafletMap);
+  }
+  setTimeout(() => {
+    leafletMap.invalidateSize();
+    renderMapMarkers(mapCity);
+  }, 50);
+}
+
+function setMapCity(city, tabEl) {
+  mapCity = city;
+  document.querySelectorAll('#map-screen .city-tab').forEach(t => t.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  closeMapPopup();
+  if (!leafletMap) return;
+  const center = CITY_CENTERS[city];
+  leafletMap.flyTo(center.latlng, center.zoom, { duration: 0.6 });
+  renderMapMarkers(city);
+}
+
+function renderMapMarkers(city) {
+  mapMarkers.forEach(m => m.remove());
+  mapMarkers = [];
+
+  const recs = getAllRecs(city);
+  recs.forEach(rec => {
+    const coords = REC_COORDS[rec.id];
+    if (!coords) return;
+    const color = getRecDayColor(rec.id);
+    const marker = L.marker(coords, { icon: makeMarkerIcon(color) }).addTo(leafletMap);
+    marker.on('click', () => showMapPopup(rec.id));
+    mapMarkers.push(marker);
+  });
+
+  renderMapLegend(city);
+}
+
+function renderMapLegend(city) {
+  const el = document.getElementById('map-legend');
+  if (!el) return;
+  const cityDayIds = city === 'rome' ? [7, 8, 9] : [10, 11, 12];
+  const usedDays = cityDayIds.filter(id => {
+    const recs = getAllRecs(city);
+    return recs.some(rec => (addedRecs[rec.id] || []).includes(id));
+  });
+
+  let html = '';
+  usedDays.forEach(id => {
+    const day = TRIP.days.find(d => d.id === id);
+    html += `<div class="map-legend-item"><div class="map-legend-dot" style="background:${DAY_COLORS[id]}"></div><span>Day ${id} · ${day ? day.date.split(',')[1].trim() : ''}</span></div>`;
+  });
+  html += `<div class="map-legend-item"><div class="map-legend-dot" style="background:${DISCOVER_COLOR}"></div><span>Not planned</span></div>`;
+  el.innerHTML = html;
+}
+
+function showMapPopup(recId) {
+  const found = findRec(recId);
+  if (!found) return;
+  const { rec } = found;
+  const assignedDays = (addedRecs[recId] || []).map(id => {
+    const d = TRIP.days.find(d => d.id === id);
+    return d ? `Day ${d.id} · ${d.date}` : null;
+  }).filter(Boolean);
+
+  const popup = document.getElementById('map-popup');
+  const body = document.getElementById('map-popup-body');
+
+  const catLabel = { sights: '▣ Sight', food: '● Food', experience: '✦ Experience' }[rec.category] || rec.category;
+  const color = getRecDayColor(recId);
+
+  body.innerHTML = `
+    <div class="map-popup-header">
+      <div class="map-popup-dot" style="background:${color}"></div>
+      <div class="map-popup-title">${rec.name}</div>
+      <button class="map-popup-close" onclick="closeMapPopup()">✕</button>
+    </div>
+    <div class="map-popup-cat">${catLabel}</div>
+    <div class="map-popup-detail">${rec.detail}</div>
+    ${rec.rating ? `<div class="map-popup-stars">${renderStars(rec.rating)} <span class="map-popup-rating-num">${rec.rating}</span></div>` : ''}
+    ${assignedDays.length ? `<div class="map-popup-days">${assignedDays.map(d => `<span class="map-popup-day-chip">${d}</span>`).join('')}</div>` : ''}
+    <div class="map-popup-actions">
+      ${rec.mapsUrl ? `<a href="${rec.mapsUrl}" target="_blank" class="map-popup-maps-btn">Maps ↗</a>` : ''}
+      <button class="map-popup-add-btn" onclick="openAddToDay('${recId}')">+ Add to day</button>
+    </div>
+  `;
+
+  popup.style.display = 'block';
+}
+
+function closeMapPopup() {
+  const popup = document.getElementById('map-popup');
+  if (popup) popup.style.display = 'none';
 }
 
 document.addEventListener('DOMContentLoaded', () => {

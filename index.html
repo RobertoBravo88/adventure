@@ -13,6 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="Adventure" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
 
@@ -97,6 +98,7 @@
       <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✦</span><span>Discover</span></button>
       <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈</span><span>Transport</span></button>
       <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">◇</span><span>Notes</span></button>
+      <button class="nav-btn" onclick="showScreen('map-screen')"><span class="nav-icon">◎</span><span>Map</span></button>
     </nav>
   </div>
 
@@ -147,6 +149,7 @@
       <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✦</span><span>Discover</span></button>
       <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈</span><span>Transport</span></button>
       <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">◇</span><span>Notes</span></button>
+      <button class="nav-btn" onclick="showScreen('map-screen')"><span class="nav-icon">◎</span><span>Map</span></button>
     </nav>
   </div>
 
@@ -199,6 +202,7 @@
       <button class="nav-btn active" onclick="showScreen('discover-screen')"><span class="nav-icon">✦</span><span>Discover</span></button>
       <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈</span><span>Transport</span></button>
       <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">◇</span><span>Notes</span></button>
+      <button class="nav-btn" onclick="showScreen('map-screen')"><span class="nav-icon">◎</span><span>Map</span></button>
     </nav>
   </div>
 
@@ -215,6 +219,7 @@
       <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✦</span><span>Discover</span></button>
       <button class="nav-btn active" onclick="showScreen('transport-screen')"><span class="nav-icon">✈</span><span>Transport</span></button>
       <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">◇</span><span>Notes</span></button>
+      <button class="nav-btn" onclick="showScreen('map-screen')"><span class="nav-icon">◎</span><span>Map</span></button>
     </nav>
   </div>
 
@@ -238,6 +243,7 @@
       <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✦</span><span>Discover</span></button>
       <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈</span><span>Transport</span></button>
       <button class="nav-btn active" onclick="showScreen('notes-screen')"><span class="nav-icon">◇</span><span>Notes</span></button>
+      <button class="nav-btn" onclick="showScreen('map-screen')"><span class="nav-icon">◎</span><span>Map</span></button>
     </nav>
   </div>
 
@@ -348,6 +354,34 @@
     <div class="trash-content" id="trash-content"></div>
   </div>
 
+  <!-- ===== MAP SCREEN ===== -->
+  <div id="map-screen" class="screen map-screen">
+    <header class="app-header">
+      <button class="back-btn" onclick="showScreen('itinerary-screen')">←</button>
+      <h2 class="header-title">Map</h2>
+      <div style="width:40px"></div>
+    </header>
+    <div class="city-tabs">
+      <button class="city-tab active" id="map-tab-rome" onclick="setMapCity('rome', this)">Rome</button>
+      <button class="city-tab" id="map-tab-florence" onclick="setMapCity('florence', this)">Florence</button>
+    </div>
+    <div id="map-container" class="map-container"></div>
+    <div class="map-legend" id="map-legend"></div>
+    <nav class="bottom-nav">
+      <button class="nav-btn" onclick="showScreen('itinerary-screen')"><span class="nav-icon">≡</span><span>Itinerary</span></button>
+      <button class="nav-btn" onclick="showScreen('discover-screen')"><span class="nav-icon">✦</span><span>Discover</span></button>
+      <button class="nav-btn" onclick="showScreen('transport-screen')"><span class="nav-icon">✈</span><span>Transport</span></button>
+      <button class="nav-btn" onclick="showScreen('notes-screen')"><span class="nav-icon">◇</span><span>Notes</span></button>
+      <button class="nav-btn active" onclick="showScreen('map-screen')"><span class="nav-icon">◎</span><span>Map</span></button>
+    </nav>
+  </div>
+
+  <!-- ===== MAP POPUP ===== -->
+  <div id="map-popup" class="map-popup" style="display:none">
+    <div class="map-popup-handle"></div>
+    <div class="map-popup-body" id="map-popup-body"></div>
+  </div>
+
   <!-- ===== ADD TO DAY MODAL ===== -->
   <div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -359,6 +393,7 @@
   </div>
 
   <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   <script src="script.js"></script>
