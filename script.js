@@ -2087,6 +2087,15 @@ function handleBackNavigation() {
 }
 
 // ===== MAP =====
+function extractLatLng(url) {
+  if (!url) return null;
+  const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (atMatch) return [parseFloat(atMatch[1]), parseFloat(atMatch[2])];
+  const qMatch = url.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (qMatch) return [parseFloat(qMatch[1]), parseFloat(qMatch[2])];
+  return null;
+}
+
 function getRecDayColor(recId) {
   const days = addedRecs[recId];
   if (days && days.length > 0) {
@@ -2148,7 +2157,7 @@ function renderMapMarkers(city) {
 
   const recs = getAllRecs(city);
   recs.forEach(rec => {
-    const coords = REC_COORDS[rec.id];
+    const coords = REC_COORDS[rec.id] || extractLatLng(rec.mapsUrl);
     if (!coords) return;
     const color = getRecDayColor(rec.id);
     const marker = L.marker(coords, { icon: makeMarkerIcon(color) }).addTo(leafletMap);
