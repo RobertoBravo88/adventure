@@ -2735,6 +2735,11 @@ html, body {
   background: var(--surface-3) !important;
 }
 
+/* Boost road and water contrast on the dark tile layer */
+#map-container .leaflet-tile-pane {
+  filter: contrast(145%) brightness(118%) saturate(115%);
+}
+
 .map-legend {
   display: flex;
   align-items: center;
