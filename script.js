@@ -2181,6 +2181,7 @@ function showMapScreen() {
       maxZoom: 19,
     }).addTo(leafletMap);
     L.control.zoom({ position: 'topright' }).addTo(leafletMap);
+    leafletMap.getPanes().tilePane.style.filter = 'contrast(145%) brightness(118%) saturate(115%)';
   }
   setTimeout(() => {
     leafletMap.invalidateSize();
