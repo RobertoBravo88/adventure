@@ -2172,6 +2172,12 @@ function makeHotelIcon() {
   });
 }
 
+function applyMapTileFilter() {
+  const el = document.querySelector('#map-container .leaflet-tile-pane')
+          || (leafletMap && leafletMap.getPane('tilePane'));
+  if (el) el.style.filter = 'contrast(160%) brightness(130%) saturate(130%)';
+}
+
 function showMapScreen() {
   const container = document.getElementById('map-container');
   if (!leafletMap) {
@@ -2181,11 +2187,12 @@ function showMapScreen() {
       maxZoom: 19,
     }).addTo(leafletMap);
     L.control.zoom({ position: 'topright' }).addTo(leafletMap);
-    leafletMap.getPanes().tilePane.style.filter = 'contrast(145%) brightness(118%) saturate(115%)';
+    applyMapTileFilter();
   }
   setTimeout(() => {
     leafletMap.invalidateSize();
     renderMapMarkers(mapCity);
+    applyMapTileFilter();
   }, 50);
 }
 
