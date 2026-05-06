@@ -1078,10 +1078,15 @@ async function fetchPhotoForPlace(name) {
 async function addCustomRec() {
   const name = document.getElementById('new-rec-name').value.trim();
   const detail = document.getElementById('new-rec-detail').value.trim();
-  const mapsUrl = document.getElementById('new-rec-maps').value.trim() || null;
+  let mapsUrl = document.getElementById('new-rec-maps').value.trim() || null;
   const category = document.getElementById('new-rec-category').value;
   const city = document.getElementById('new-rec-city').value;
   if (!name) { showToast('Add a name first'); return; }
+
+  if (mapsUrl && isShortMapLink(mapsUrl)) {
+    showToast('Resolving Maps link…');
+    mapsUrl = await resolveShortMapUrl(mapsUrl);
+  }
 
   const id = `custom_${Date.now()}`;
   let photo = null;
@@ -1141,7 +1146,7 @@ function onActivityTypeChange(select) {
   }
 }
 
-function addActivity() {
+async function addActivity() {
   const input = document.getElementById('new-activity-input');
   const typeSelect = document.getElementById('new-activity-type');
   const noteArea = document.getElementById('new-activity-note');
@@ -1165,6 +1170,11 @@ function addActivity() {
     const extracted = parseMapsUrl(raw);
     name = extracted || 'Place from Maps';
     mapsUrl = raw;
+  }
+
+  if (mapsUrl && isShortMapLink(mapsUrl)) {
+    showToast('Resolving Maps link…');
+    mapsUrl = await resolveShortMapUrl(mapsUrl);
   }
 
   day.activities.push({ id: nextActivityId++, type: typeSelect.value, name, detail, mapsUrl, liked: false });
@@ -2096,13 +2106,42 @@ function handleBackNavigation() {
 // ===== MAP =====
 function extractLatLng(url) {
   if (!url) return null;
-  // @lat,lng — standard place/search URL (most common, copy from browser bar)
+  // @lat,lng — standard place/search URL (most common)
   const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
   if (atMatch) return [parseFloat(atMatch[1]), parseFloat(atMatch[2])];
-  // ?q=lat,lng or &ll=lat,lng or &query=lat,lng or &daddr=lat,lng
+  // ?q=lat,lng or &ll=lat,lng or &query=lat,lng etc.
   const paramMatch = url.match(/[?&](?:q|ll|query|daddr|center|cbll)=(-?\d+\.\d+),(-?\d+\.\d+)/);
   if (paramMatch) return [parseFloat(paramMatch[1]), parseFloat(paramMatch[2])];
   return null;
+}
+
+function isShortMapLink(url) {
+  return url && /maps\.app\.goo\.gl|goo\.gl\/maps/.test(url);
+}
+
+async function resolveShortMapUrl(url) {
+  try {
+    const res = await fetch(
+      `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+      { signal: AbortSignal.timeout(7000) }
+    );
+    if (!res.ok) return url;
+    const data = await res.json();
+    // Check the final URL reported by the proxy after redirect
+    const finalUrl = data?.status?.url || '';
+    if (finalUrl !== url && extractLatLng(finalUrl)) return finalUrl;
+    // Search the returned HTML for @lat,lng
+    const html = data?.contents || '';
+    const atMatch = html.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (atMatch) return `https://www.google.com/maps/@${atMatch[1]},${atMatch[2]},15z`;
+    // Look for a Google Maps URL in a meta-refresh redirect
+    const metaMatch = html.match(/url=([^"']+google\.com\/maps[^"']+)/i);
+    if (metaMatch) {
+      const redirectUrl = decodeURIComponent(metaMatch[1].replace(/&amp;/g, '&'));
+      if (extractLatLng(redirectUrl)) return redirectUrl;
+    }
+  } catch(e) {}
+  return url; // return original if resolution fails
 }
 
 function getRecDayColor(recId) {
