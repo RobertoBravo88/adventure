@@ -2172,27 +2172,22 @@ function makeHotelIcon() {
   });
 }
 
-function applyMapTileFilter() {
-  const el = document.querySelector('#map-container .leaflet-tile-pane')
-          || (leafletMap && leafletMap.getPane('tilePane'));
-  if (el) el.style.filter = 'contrast(160%) brightness(130%) saturate(130%)';
-}
-
 function showMapScreen() {
   const container = document.getElementById('map-container');
   if (!leafletMap) {
     leafletMap = L.map(container, { zoomControl: false, attributionControl: false })
       .setView(CITY_CENTERS[mapCity].latlng, CITY_CENTERS[mapCity].zoom);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 16,
+    }).addTo(leafletMap);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 16,
     }).addTo(leafletMap);
     L.control.zoom({ position: 'topright' }).addTo(leafletMap);
-    applyMapTileFilter();
   }
   setTimeout(() => {
     leafletMap.invalidateSize();
     renderMapMarkers(mapCity);
-    applyMapTileFilter();
   }, 50);
 }
 
